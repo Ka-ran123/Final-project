@@ -1,0 +1,22 @@
+{
+  "name": "final-project",
+  "version": "1.0.0",
+  "description": "final project for BCA sem-VI",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev":"nodemon server.js",
+    "start":"node server.js"
+  },
+  "author": "karan unagar",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.1",
+    "express": "^4.18.2",
+    "mongoose": "^8.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}
