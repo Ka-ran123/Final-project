@@ -3,11 +3,20 @@ import { generateToken } from "../utils/genToken.js";
 import { transporter } from "../utils/nodemailer.js";
 import { generateOTP } from "../utils/genOtp.js";
 import { OtpModel } from "../model/otp.model.js";
-
+import {publicUrl} from "../utils/profilepic.js"
 const userController = {
   signUp: async function (req, res) {
     try {
       const data = req.body;
+
+      if((data.name && data.email && data.mobileNo && data.password)=== ""){
+        const response = {
+          statusCode: 401,
+          sucess: false,
+          message: "Please Enter Valid Fiedls",
+        };
+        return res.status(200).json(response);
+      }
 
       const findUser = await UserModel.findOne({ email: data.email });
 
@@ -29,7 +38,10 @@ const userController = {
         return res.status(200).json(response);
       }
 
-      const user = new UserModel(data);
+      const nameFirstLetter = data.name.toLowerCase().slice(0, 1);
+      const url = publicUrl(nameFirstLetter);
+
+      const user = new UserModel({...data , image:url});
       await user.save();
 
       const token = generateToken({ id: user._id });
@@ -101,6 +113,16 @@ const userController = {
   signIn: async function (req, res) {
     try {
       const { email, password } = req.body;
+
+      if((email && password)=== ""){
+        const response = {
+          statusCode: 401,
+          sucess: false,
+          message: "Please Enter Valid Fiedls",
+        };
+        return res.status(200).json(response);
+      }
+
       const findUser = await UserModel.findOne({ email: email });
 
       if (!findUser) {
@@ -128,6 +150,11 @@ const userController = {
       );
       const token = generateToken({ id: findUser._id });
 
+      const options={
+        httpOnly:true,
+        secure:true
+      }
+
       const response = {
         statusCode: 201,
         success: true,
@@ -135,7 +162,9 @@ const userController = {
         user,
         message: "User logged In Successfully",
       };
-      return res.status(200).json(response);
+      return res.status(200)
+      .cookie("Token",token,options)
+      .json(response);
     } catch (error) {
       const response = {
         statusCode: 500,
@@ -266,6 +295,25 @@ const userController = {
             message: "Server Error",
           };
           return res.status(200).json(response);
+    }
+  },
+
+  getData:async function(req,res){
+    try {
+      const response = {
+        statusCode: 201,
+        sucess: true,
+        userData:req.user,
+        message: "User Fetched Successfully",
+      };
+      return res.status(200).json(response);
+    } catch (error) {
+      const response = {
+        statusCode: 501,
+        sucess: false,
+        message: "Server Error",
+      };
+      return res.status(200).json(response);
     }
   }
 };
