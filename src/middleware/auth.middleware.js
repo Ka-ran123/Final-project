@@ -21,7 +21,7 @@ export const verifyUser = async(req,res,next)=>{
         const decodeToken=verifyToken(token,JWT_SECRET_KEY)
         // console.log(decodeToken);
 
-        const user=await UserModel.findById(decodeToken?.id)
+        const user=await UserModel.findById(decodeToken?.id).select("-password")
         // console.log(user);
 
         if(!user)

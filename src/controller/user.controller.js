@@ -3,13 +3,13 @@ import { generateToken } from "../utils/genToken.js";
 import { transporter } from "../utils/nodemailer.js";
 import { generateOTP } from "../utils/genOtp.js";
 import { OtpModel } from "../model/otp.model.js";
-import {publicUrl} from "../utils/profilepic.js"
+import { publicUrl } from "../utils/profilepic.js";
 const userController = {
   signUp: async function (req, res) {
     try {
       const data = req.body;
 
-      if((data.name && data.email && data.mobileNo && data.password)=== ""){
+      if ((data.name && data.email && data.mobileNo && data.password) === "") {
         const response = {
           statusCode: 401,
           sucess: false,
@@ -41,7 +41,7 @@ const userController = {
       const nameFirstLetter = data.name.toLowerCase().slice(0, 1);
       const url = publicUrl(nameFirstLetter);
 
-      const user = new UserModel({...data , image:url});
+      const user = new UserModel({ ...data, image: url });
       await user.save();
 
       const token = generateToken({ id: user._id });
@@ -114,7 +114,7 @@ const userController = {
     try {
       const { email, password } = req.body;
 
-      if((email && password)=== ""){
+      if ((email && password) === "") {
         const response = {
           statusCode: 401,
           sucess: false,
@@ -150,10 +150,10 @@ const userController = {
       );
       const token = generateToken({ id: findUser._id });
 
-      const options={
-        httpOnly:true,
-        secure:true
-      }
+      const options = {
+        httpOnly: true,
+        secure: true,
+      };
 
       const response = {
         statusCode: 201,
@@ -162,9 +162,7 @@ const userController = {
         user,
         message: "User logged In Successfully",
       };
-      return res.status(200)
-      .cookie("Token",token,options)
-      .json(response);
+      return res.status(200).cookie("Token", token, options).json(response);
     } catch (error) {
       const response = {
         statusCode: 500,
@@ -222,15 +220,15 @@ const userController = {
 
       transporter.sendMail(mailOptions, async (err, info) => {
         if (err) {
-            const response = {
-                statusCode: 400,
-                sucess: false,
-                message: err.message,
-              };
-            return res.status(200).json(response);
+          const response = {
+            statusCode: 400,
+            sucess: false,
+            message: err.message,
+          };
+          return res.status(200).json(response);
         } else {
           await OtpModel.findOneAndDelete({ email: findUser.email });
-          const user =  new OtpModel({ email: findUser.email, otp: otp });
+          const user = new OtpModel({ email: findUser.email, otp: otp });
           await user.save();
 
           setTimeout(async () => {
@@ -254,56 +252,177 @@ const userController = {
       return res.status(200).json(response);
     }
   },
-  verifyOtp:async function(req,res){
+  verifyOtp: async function (req, res) {
     try {
-        const {email,otp}=req.body;
+      const { email, otp } = req.body;
 
-        const findUser=await OtpModel.findOne({email})
+      const findUser = await OtpModel.findOne({ email });
 
-        if (!findUser) {
-            const response = {
-              statusCode: 401,
-              sucess: false,
-              message: "OTP Not Send",
-            };
-            return res.status(200).json(response);
-          }
-
-        if(findUser.otp !== otp)
-        {
-            const response = {
-                statusCode: 401,
-                sucess: false,
-                message: "OTP is Wrong",
-              };
-              return res.status(200).json(response);
-        }
-
-        await OtpModel.findOneAndDelete({email:findUser.email})
-
+      if (!findUser) {
         const response = {
-            statusCode: 201,
-            sucess: true,
-            message: "OTP is Right",
-          };
-          return res.status(200).json(response);
-        
+          statusCode: 401,
+          sucess: false,
+          message: "OTP Not Send",
+        };
+        return res.status(200).json(response);
+      }
+
+      if (findUser.otp !== otp) {
+        const response = {
+          statusCode: 401,
+          sucess: false,
+          message: "OTP is Wrong",
+        };
+        return res.status(200).json(response);
+      }
+
+      await OtpModel.findOneAndDelete({ email: findUser.email });
+
+      const response = {
+        statusCode: 201,
+        sucess: true,
+        message: "OTP is Right",
+      };
+      return res.status(200).json(response);
     } catch (error) {
-        const response = {
-            statusCode: 500,
-            sucess: false,
-            message: "Server Error",
-          };
-          return res.status(200).json(response);
+      const response = {
+        statusCode: 500,
+        sucess: false,
+        message: "Server Error",
+      };
+      return res.status(200).json(response);
     }
   },
+  forgetPassword: async function (req, res) {
+    try {
+      const { email } = req.body;
+      const findUser = await UserModel.findOne({ email });
+      if (!findUser) {
+        const response = {
+          statusCode: 404,
+          success: false,
+          message: "User Not Found",
+        };
+        return res.status(200).json(response);
+      }
 
-  getData:async function(req,res){
+      const otp = generateOTP();
+
+      const mailFormat = `
+      <table cellpadding="0" cellspacing="0" width="100%" bgcolor="#f0f0f0">
+      <tr>
+          <td align="center">
+              <table width="600" cellpadding="0" cellspacing="0">
+                  <tr>
+                      <td>
+                          <div style="padding: 20px; background-color: #ffffff; text-align: center;">
+                          <img src="https://media.istockphoto.com/id/1300422159/photo/woman-hand-enter-a-one-time-password-for-the-validation-process-mobile-otp-secure.webp?b=1&s=170667a&w=0&k=20&c=eADS7XcHTFs4kNItYwelOtHYFVbl0RWpSuXJgjFjai4=" alt="OTP Image" width="200" height="200" style="display: block; margin: 0 auto;">
+                              <h1>One-Time Password OTP Verification</h1>
+                              <p>Hello there!</p>
+                              <p>Your OTP code is: <strong style="font-size: 24px;">${otp}</strong></p>
+                              <p>This OTP will expire in 1 minutes.</p>
+                              <p>If you didn't request this OTP, please ignore this email.</p>
+                              <P>Don't share your otp with someone else.</p>
+                          </div>
+                      </td>
+                  </tr>
+              </table>
+          </td>
+      </tr>
+      </table>
+      `;
+
+      const mailOptions = {
+        to: findUser.email,
+        subject: "Forget Password OTP ",
+        html: mailFormat,
+      };
+
+      transporter.sendMail(mailOptions, async (error, info) => {
+        if (error) {
+          const response = { success: false, message: error.message };
+          return res.status(400).json(response);
+        } else {
+          await OtpModel.findOneAndDelete({ email: findUser.email });
+          const user = new OtpModel({ email: findUser.email, otp: otp });
+          await user.save();
+
+          setTimeout(async () => {
+            await OtpModel.findOneAndDelete({ email: findUser.email });
+          }, 1000 * 60);
+
+          const response = { success: true, message: "Otp Send" };
+          return res.status(200).json(response);
+        }
+      });
+    } catch (error) {
+      const response = {
+        statusCode: 500,
+        sucess: false,
+        message: "Internal server error",
+      };
+      return res.status(200).json(response);
+    }
+  },
+  resetPassword:async function(req,res){
+      const {email,newPassword}=req.body
+      const findUser = await UserModel.findOne({ email });
+      if (!findUser) {
+        const response = {
+          statusCode: 404,
+          success: false,
+          message: "User Not Found",
+        };
+        return res.status(200).json(response);
+      }
+      
+      findUser.password = newPassword;
+      await findUser.save();
+
+      const response={
+        statusCode:200,
+        success:true,
+        message:"Password is Reset Successfully"
+      }
+
+      return res.status(200).json(response)
+  },
+  changePassword:async function(req,res)
+  {
+    const {oldPassword,newPassword}=req.body
+
+    const user=await UserModel.findById(req.user?._id)
+    console.log(user);
+
+    const matchPasssword=await user.isPasswordCorrect(oldPassword)
+    console.log(matchPasssword);
+
+    if(!matchPasssword)
+    {
+      const response = {
+        statusCode: 400,
+        sucess: false,
+        message: "Invalid Old Password",
+      };
+      return res.status(200).json(response);
+    }
+
+    user.password=newPassword
+    await user.save({validateBeforeSave:false})                //validation check ny kre
+
+    const response = {
+      statusCode: 200,
+      sucess: true,
+      message: "Password change Successfully",
+    };
+    return res.status(200).json(response);
+  },
+  getCurrentUser: async function (req, res) {
     try {
       const response = {
         statusCode: 201,
         sucess: true,
-        userData:req.user,
+        userData: req.user,
         message: "User Fetched Successfully",
       };
       return res.status(200).json(response);
@@ -315,7 +434,7 @@ const userController = {
       };
       return res.status(200).json(response);
     }
-  }
+  },
 };
 
 export { userController };

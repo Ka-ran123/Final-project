@@ -7,6 +7,11 @@ router.post('/sign-up' , userController.signUp);
 router.post('/sign-in' , userController.signIn);
 router.post('/verify-email' , userController.verifyEmail);
 router.post('/verify-otp' , userController.verifyOtp);
-router.get('/get-user',verifyUser,userController.getData)
+router.post('/forget-password' , userController.forgetPassword);
+router.post('/reset-password',userController.resetPassword);
+router.post('/change-password',verifyUser,userController.changePassword);
 
+router.get('/get-user',verifyUser,userController.getCurrentUser);
 export const userRouter = router
+
+

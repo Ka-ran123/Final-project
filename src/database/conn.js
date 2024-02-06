@@ -1,7 +1,7 @@
 import mongoose from "mongoose"
 import { DB_ATLAS } from "../config/config.js";
 
-const connectDB = async () => {
+export const connectDB = async () => {
     try {
         const connectionInstance = await mongoose.connect(DB_ATLAS)
         console.log(`\n MongoDB connected !! DB HOST: ${connectionInstance.connection.host}`);
@@ -10,5 +10,3 @@ const connectDB = async () => {
         process.exit(1)
     }
 }
-
-export default connectDB

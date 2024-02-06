@@ -48,6 +48,14 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    resetPasswordToken: {
+      type: String,
+      default: "",
+    },
+    resetTokenExpiry: {
+      type: String,
+      default: "",
+    },
   },
   { timestamps: true }
 );
@@ -57,7 +65,7 @@ userSchema.pre("save", async function (next) {
     const salt = bcrypt.genSaltSync(10);
     this.password = await bcrypt.hash(this.password, salt);
   }
-  next()
+  next();
 });
 
 userSchema.methods.isPasswordCorrect = async function (password) {
