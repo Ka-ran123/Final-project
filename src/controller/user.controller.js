@@ -392,10 +392,10 @@ const userController = {
     const {oldPassword,newPassword}=req.body
 
     const user=await UserModel.findById(req.user?._id)
-    console.log(user);
+    // console.log(user);
 
     const matchPasssword=await user.isPasswordCorrect(oldPassword)
-    console.log(matchPasssword);
+    // console.log(matchPasssword);
 
     if(!matchPasssword)
     {
