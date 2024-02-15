@@ -13,10 +13,11 @@ cloudinary.config({
 const fileUploadInCloudinary = async (localfilepath)=>{
     try {
         if(!localfilepath) return null
-        const response=cloudinary.uploader.upload(localfilepath , {
-          resource_type: "auto"   //it's for what we upload like video,image etc
+        const response=await cloudinary.uploader.upload(localfilepath , {
+          resource_type: "auto", //it's for what we upload like video,image etc
+          // folder:"profile_picture"      
         });
-        console.log(response);
+        // console.log(response);
         fs.unlinkSync(localfilepath)   //upload successfully when remove file from locally
         return response;
     } catch (error) {     
@@ -25,4 +26,10 @@ const fileUploadInCloudinary = async (localfilepath)=>{
     }
 }
 
-export {fileUploadInCloudinary}
+
+const fileDestroyInCloudinary =async (localfilepath)=>{
+  const response=await cloudinary.uploader.destroy(localfilepath)
+  return response
+}
+
+export {fileUploadInCloudinary,fileDestroyInCloudinary}

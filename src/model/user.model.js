@@ -27,7 +27,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-    image: {
+    profilePic: {
       type: String,
       default: null,
     },
@@ -47,14 +47,6 @@ const userSchema = new Schema(
     isLogin: {
       type: Boolean,
       default: false,
-    },
-    resetPasswordToken: {
-      type: String,
-      default: "",
-    },
-    resetTokenExpiry: {
-      type: String,
-      default: "",
     },
   },
   { timestamps: true }
@@ -77,7 +69,7 @@ userSchema.methods.getData = function () {
     id: this._id,
     name: this.name,
     email: this.email,
-    image: this.image,
+    profilePic: this.profilePic,
     isLogin: this.isLogin,
   };
 };
