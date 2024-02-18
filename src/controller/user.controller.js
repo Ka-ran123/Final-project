@@ -21,14 +21,14 @@ const userController = {
 
       const findUser = await UserModel.findOne({ email: data.email });
 
-      if (data.role === "ADMIN") {
-        const response = {
-          statusCode: 401,
-          sucess: false,
-          message: "Select USER role",
-        };
-        return res.status(200).json(response);
-      }
+      // if (data.role === "ADMIN") {
+      //   const response = {
+      //     statusCode: 401,
+      //     sucess: false,
+      //     message: "Select USER role",
+      //   };
+      //   return res.status(200).json(response);
+      // }
 
       if (findUser) {
         const response = {
@@ -104,7 +104,7 @@ const userController = {
       return res.status(200).json(response);
     } catch (error) {
       const response = {
-        statusCode: 500,
+        statusCode: 501,
         sucess: false,
         message: error.message,
       };
@@ -156,8 +156,6 @@ const userController = {
         secure: true,
       };
 
-      user.isLogin = true;
-
       const response = {
         statusCode: 201,
         success: true,
@@ -168,9 +166,9 @@ const userController = {
       return res.status(200).cookie("Token", token, options).json(response);
     } catch (error) {
       const response = {
-        statusCode: 500,
+        statusCode: 501,
         sucess: false,
-        message: "Server Error",
+        message: error.message,
       };
       return res.status(200).json(response);
     }
@@ -178,17 +176,6 @@ const userController = {
   verifyEmail: async function (req, res) {
     try {
       const { email } = req.body;
-
-      const findUser = await UserModel.findOne({ email: email });
-
-      if (!findUser) {
-        const response = {
-          statusCode: 401,
-          sucess: false,
-          message: "User Not Exits",
-        };
-        return res.status(200).json(response);
-      }
 
       const otp = generateOTP();
 
@@ -216,7 +203,7 @@ const userController = {
                 </table>
                 `;
       const mailOptions = {
-        to: findUser.email,
+        to:email,
         subject: "Verify Email OTP ",
         html: mailFormat,
       };
@@ -230,12 +217,12 @@ const userController = {
           };
           return res.status(200).json(response);
         } else {
-          await OtpModel.findOneAndDelete({ email: findUser.email });
-          const user = new OtpModel({ email: findUser.email, otp: otp });
+          await OtpModel.findOneAndDelete({ email:email });
+          const user = new OtpModel({ email:email, otp: otp });
           await user.save();
 
           setTimeout(async () => {
-            await OtpModel.findOneAndDelete({ email: findUser.email });
+            await OtpModel.findOneAndDelete({ email:email });
           }, 1000 * 60);
         }
       });
@@ -248,9 +235,9 @@ const userController = {
       return res.status(200).json(response);
     } catch (error) {
       const response = {
-        statusCode: 500,
+        statusCode: 501,
         sucess: false,
-        message: "Server Error",
+        message: error.message,
       };
       return res.status(200).json(response);
     }
@@ -289,9 +276,9 @@ const userController = {
       return res.status(200).json(response);
     } catch (error) {
       const response = {
-        statusCode: 500,
+        statusCode: 501,
         sucess: false,
-        message: "Server Error",
+        message: error.message,
       };
       return res.status(200).json(response);
     }
@@ -360,63 +347,83 @@ const userController = {
       });
     } catch (error) {
       const response = {
-        statusCode: 500,
+        statusCode: 501,
         sucess: false,
-        message: "Internal server error",
+        message: error.message,
       };
       return res.status(200).json(response);
     }
   },
   resetPassword: async function (req, res) {
-    const { email, newPassword } = req.body;
-    const findUser = await UserModel.findOne({ email });
-    if (!findUser) {
+    
+    try {
+      const { email, newPassword } = req.body;
+      const findUser = await UserModel.findOne({ email });
+      if (!findUser) {
+        const response = {
+          statusCode: 404,
+          success: false,
+          message: "User Not Found",
+        };
+        return res.status(200).json(response);
+      }
+  
+      findUser.password = newPassword;
+      await findUser.save();
+  
       const response = {
-        statusCode: 404,
-        success: false,
-        message: "User Not Found",
+        statusCode: 200,
+        success: true,
+        message: "Password is Reset Successfully",
+      };
+  
+      return res.status(200).json(response);
+    } catch (error) {
+      const response = {
+        statusCode: 501,
+        sucess: false,
+        message: error.message,
       };
       return res.status(200).json(response);
     }
-
-    findUser.password = newPassword;
-    await findUser.save();
-
-    const response = {
-      statusCode: 200,
-      success: true,
-      message: "Password is Reset Successfully",
-    };
-
-    return res.status(200).json(response);
   },
   changePassword: async function (req, res) {
-    const { oldPassword, newPassword } = req.body;
 
-    const user = await UserModel.findById(req.user?._id);
-    // console.log(user);
-
-    const matchPasssword = await user.isPasswordCorrect(oldPassword);
-    // console.log(matchPasssword);
-
-    if (!matchPasssword) {
+    try {
+      const { oldPassword, newPassword } = req.body;
+  
+      const user = await UserModel.findById(req.user?._id);
+      // console.log(user);
+  
+      const matchPasssword = await user.isPasswordCorrect(oldPassword);
+      // console.log(matchPasssword);
+  
+      if (!matchPasssword) {
+        const response = {
+          statusCode: 400,
+          sucess: false,
+          message: "Invalid Old Password",
+        };
+        return res.status(200).json(response);
+      }
+  
+      user.password = newPassword;
+      await user.save({ validateBeforeSave: false }); //validation check ny kre
+  
       const response = {
-        statusCode: 400,
+        statusCode: 200,
+        sucess: true,
+        message: "Password change Successfully",
+      };
+      return res.status(200).json(response);
+    } catch (error) {
+      const response = {
+        statusCode: 501,
         sucess: false,
-        message: "Invalid Old Password",
+        message: error.message,
       };
       return res.status(200).json(response);
     }
-
-    user.password = newPassword;
-    await user.save({ validateBeforeSave: false }); //validation check ny kre
-
-    const response = {
-      statusCode: 200,
-      sucess: true,
-      message: "Password change Successfully",
-    };
-    return res.status(200).json(response);
   },
   getCurrentUser: async function (req, res) {
     try {
