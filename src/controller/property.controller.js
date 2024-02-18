@@ -19,7 +19,7 @@ const PropertyController = {
       }
 
       const data = req.body;
-
+         
       if (user.email !== data.email && user.mobileNo !== data.mobileNo) {
         const response = {
           statusCode: 400,
@@ -28,7 +28,7 @@ const PropertyController = {
         };
         return res.status(200).json(response);
       }
-
+       
       if (req.files === undefined) {
         const response = {
           statusCode: 400,
@@ -37,18 +37,18 @@ const PropertyController = {
         };
         return res.status(200).json(response);
       }
-
+     
       const image = [];
       for (let i = 0; i < req.files.length; i++) {
         let result = await fileUploadInCloudinary(req.files[i].path);
         image.push(result.secure_url);
       }
-
+     
       data.propertyImage = image;
       data.facility = data.facility.split(",");
-
+     
       const propertyData = new PropertyModel({...data,userId:user._id});
-
+      
       await propertyData.save();
 
       const response = {
@@ -235,5 +235,5 @@ const PropertyController = {
       }
   }
 };
-
+     
 export { PropertyController };
