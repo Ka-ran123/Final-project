@@ -42,7 +42,7 @@ const userController = {
       const nameFirstLetter = data.name.toLowerCase().slice(0, 1);
       const url = publicUrl(nameFirstLetter);
 
-      const user = new UserModel({ ...data , profilePic:url });
+      const user = new UserModel({ ...data, profilePic: url });
       await user.save();
 
       const token = generateToken({ id: user._id });
@@ -203,7 +203,7 @@ const userController = {
                 </table>
                 `;
       const mailOptions = {
-        to:email,
+        to: email,
         subject: "Verify Email OTP ",
         html: mailFormat,
       };
@@ -217,12 +217,12 @@ const userController = {
           };
           return res.status(200).json(response);
         } else {
-          await OtpModel.findOneAndDelete({ email:email });
-          const user = new OtpModel({ email:email, otp: otp });
+          await OtpModel.findOneAndDelete({ email: email });
+          const user = new OtpModel({ email: email, otp: otp });
           await user.save();
 
           setTimeout(async () => {
-            await OtpModel.findOneAndDelete({ email:email });
+            await OtpModel.findOneAndDelete({ email: email });
           }, 1000 * 60);
         }
       });
@@ -283,7 +283,7 @@ const userController = {
       return res.status(200).json(response);
     }
   },
-  forgetPassword: async function (req, res) {
+  forgotPassword: async function (req, res) {
     try {
       const { email } = req.body;
       const findUser = await UserModel.findOne({ email });
@@ -443,12 +443,11 @@ const userController = {
       return res.status(200).json(response);
     }
   },
-  changeProfilePic:async function(req,res){
+  changeProfilePic: async function (req, res) {
     try {
-      const user=await UserModel.findById(req.user?._id)
+      const user = await UserModel.findById(req.user?._id)
 
-      if(!user)
-      {
+      if (!user) {
         const response = {
           statusCode: 404,
           sucess: false,
@@ -459,8 +458,7 @@ const userController = {
 
       const profilePicLocalPath = req.file?.path
 
-      if(!profilePicLocalPath)
-      {
+      if (!profilePicLocalPath) {
         const response = {
           statusCode: 404,
           sucess: false,
@@ -469,12 +467,11 @@ const userController = {
         return res.status(200).json(response);
       }
 
-      if(user.publicUrl !== null)
-      {
+      if (user.publicUrl !== null) {
         await fileDestroyInCloudinary(user.publicUrl)
       }
 
-      const profilePicInCloudinary=await fileUploadInCloudinary(profilePicLocalPath);
+      const profilePicInCloudinary = await fileUploadInCloudinary(profilePicLocalPath);
 
       user.profilePic = profilePicInCloudinary.secure_url;
       user.publicUrl = profilePicInCloudinary.public_id
@@ -487,7 +484,7 @@ const userController = {
         message: "Profile Picture Change Successfully",
       };
       return res.status(200).json(response);
-      
+
     } catch (error) {
       const response = {
         statusCode: 501,
@@ -497,12 +494,11 @@ const userController = {
       return res.status(200).json(response);
     }
   },
-  deleteProfilePic:async function(req,res){
+  deleteProfilePic: async function (req, res) {
     try {
-      const user=await UserModel.findById(req.user?._id)
+      const user = await UserModel.findById(req.user?._id)
 
-      if(!user)
-      {
+      if (!user) {
         const response = {
           statusCode: 404,
           sucess: false,
@@ -516,7 +512,7 @@ const userController = {
       const nameFirstLetter = user.name.toLowerCase().slice(0, 1);
       const url = publicUrl(nameFirstLetter);
       user.profilePic = url
-      user.publicUrl=null
+      user.publicUrl = null
       await user.save()
 
       const response = {
@@ -534,6 +530,95 @@ const userController = {
         message: error.message,
       };
       return res.status(200).json(response);
+    }
+  },
+  googleLoginUser: async function (req, res) {
+    try {
+      const token = req.body.token;
+      const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: process.env.CLIENTID
+      })
+      let payload = ticket.getPayload();
+      const findUser = await UserModel.findOne({ email: payload.email });
+      if (findUser) {
+        const userToken = generateToken(findUser._id);
+        const response = {
+          success: true,
+          data: findUser.getData(),
+          message: "SignIn successfully",
+          token: userToken,
+        };
+        return res.status(200).json(response);
+      }
+      const result = await uploads(payload.picture, "profile");
+      const newUser = new UserModel({
+        name: payload.name,
+        email: payload.email,
+        image: result.secure_url,
+        publicUrl: result.public_id,
+        isLogin: true
+      });
+      await newUser.save();
+      const userData = newUser.getData();
+      const userToken = generateToken(newUser._id);
+      const emailTemp = `
+      <table cellpadding="0" cellspacing="0" width="100%" bgcolor="#f0f0f0">
+  <tr>
+      <td align="center">
+          <table width="600" cellpadding="0" cellspacing="0">
+              <tr>
+                  <td>
+                      <div style="padding: 20px; background-color: white; text-align: center;">
+                      <img src="https://media.istockphoto.com/id/1472307744/photo/clipboard-and-pencil-on-blue-background-notepad-icon-clipboard-task-management-todo-check.webp?b=1&s=170667a&w=0&k=20&c=WfRoNKWq5Dr-23RuNifv1kbIR1LVuZAsCzzSH2I3HsY=" alt="Logo" width="200" height="100" style="display: block; margin: 0 auto;">
+                          <h1>Welcome to Our Service!</h1>
+                          <p>Dear ${userData.name},</p>
+                          <p>Thank you for registering with Our app. You're now a part of our community.</p>
+                          <p>Your account details:</p>
+                          
+                          <strong>Username:</strong> ${userData.name}<br>
+                          <strong>Email:</strong> ${userData.email}
+                          
+                          <p>We're excited to have you on board, and you can start using our service right away.</p>
+                          <p>If you have any questions or need assistance, please don't hesitate to contact our support team at pradiptimbadiya@gmail.com.</p>
+                          <p>Best regards,</p>
+                          <p>Todolist</p>
+                      </div>
+                  </td>
+              </tr>
+          </table>
+      </td>
+  </tr>
+</table>
+
+      `
+      transporter.sendMail({
+        to: userData.email,
+        subject: "Home-Hub Market",
+        html: emailTemp
+      }, (err, info) => {
+        if (err) {
+
+        } else {
+          console.log("Email Sent : " + info.response);
+        }
+      })
+      const response = { 
+        statusCode: 201,
+        success: true, 
+        data: userData, 
+        message: "New User Created", 
+        token: userToken 
+      };
+      return res.status(200).json(response);
+
+    } catch (error) {
+      const response = { 
+        statusCode: 501,
+        success: false, 
+        message: error.message 
+      };
+      return res.status(400).json(response)
     }
   }
 };
