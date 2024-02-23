@@ -10,7 +10,8 @@ const userController = {
     try {
       const data = req.body;
 
-      if ((data.name && data.email && data.mobileNo && data.password) === "") {
+
+      if ((data.name && data.email && data.mobileNo && data.password) === undefined) {
         const response = {
           statusCode: 401,
           sucess: false,

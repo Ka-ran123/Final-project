@@ -12,45 +12,56 @@ const propertySchema = new Schema({
       message: "Plz ! Select One..!",
     },
     required: true,
+    trim:true
   },
   description: {
     type: String,
+    trim:true
   },
   propertyImage: {
     type: [String],
     required: true,
+    trim:true
   },
   address: {
     type: String,
     required: true,
+    trim:true
   },
   state: {
     type: String,
     required: true,
+    trim:true
   },
   city: {
     type: String,
     required: true,
+    trim:true
   },
   size: {
     type: String,
     required: true,
+    trim:true
   },
   price: {
     type: String,
     required: true,
+    trim:true
   },
   propertyAge: {
     type: String,
     required: true,
+    trim:true
   },
   floorNo: {
     type: String,
     required: true,
+    trim:true
   },
   rooms: {
     type: String,
     required: true,
+    trim:true
   },
   propertyType: {
     type: String,
@@ -59,6 +70,7 @@ const propertySchema = new Schema({
       message: "Plz ! Select One..!",
     },
     required: true,
+    trim:true
   },
   faching: {
     type: String,
@@ -67,6 +79,7 @@ const propertySchema = new Schema({
       message: "Plz ! Select One..!",
     },
     required: true,
+    trim:true
   },
   houseType: {
     type: String,
@@ -75,10 +88,12 @@ const propertySchema = new Schema({
       message: "Plz ! Select One..!",
     },
     required: true,
+    trim:true
   },
   facility: {
     type: [String],
     required: true,
+    trim:true
   },
   furnishing: {
     type: String,
@@ -87,6 +102,7 @@ const propertySchema = new Schema({
       message: "Plz ! Select One..!",
     },
     required: true,
+    trim:true
   },
   status: {
     type: String,
@@ -95,19 +111,27 @@ const propertySchema = new Schema({
       message: "Plz ! Select One..!",
     },
     required: true,
+    trim:true
   },
   mobileNo: {
     type: String,
     required: true,
+    trim:true
   },
   email: {
     type: String,
     required: true,
+    trim:true
   },
   agentId:{
     type:mongoose.Schema.Types.ObjectId,
     // ref:'user',
     default:null,
+  },
+  isRent:{
+    type:Boolean,
+    default:false,
+    trim:true
   }
 
 },{timestamps:true});
