@@ -94,7 +94,7 @@ const propertySchema = new Schema({
       values: ["approval", "cancle", "pending"],
       message: "Plz ! Select One..!",
     },
-    required: true,
+    default: "pending"
   },
   mobileNo: {
     type: String,

@@ -204,7 +204,7 @@ const PropertyController = {
         return res.status(200).json(response);
       }
   },
-  getUserCancleProperty:async (req,res)=>{
+  getUserCancelProperty:async (req,res)=>{
     try {
         const user = await UserModel.findById(req.user?._id);
         if (!user) {
