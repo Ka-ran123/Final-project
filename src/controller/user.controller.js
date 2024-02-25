@@ -4,14 +4,19 @@ import { transporter } from "../utils/nodemailer.js";
 import { generateOTP } from "../utils/genOtp.js";
 import { OtpModel } from "../model/otp.model.js";
 import { publicUrl } from "../utils/profilepic.js";
-import { fileDestroyInCloudinary, fileUploadInCloudinary } from "../utils/clodinary.js";
+import {
+  fileDestroyInCloudinary,
+  fileUploadInCloudinary,
+} from "../utils/clodinary.js";
 const userController = {
   signUp: async function (req, res) {
     try {
       const data = req.body;
 
-
-      if ((data.name && data.email && data.mobileNo && data.password) === undefined) {
+      if (
+        (data.name && data.email && data.mobileNo && data.password) ===
+        undefined
+      ) {
         const response = {
           statusCode: 401,
           sucess: false,
@@ -356,7 +361,6 @@ const userController = {
     }
   },
   resetPassword: async function (req, res) {
-    
     try {
       const { email, newPassword } = req.body;
       const findUser = await UserModel.findOne({ email });
@@ -368,16 +372,16 @@ const userController = {
         };
         return res.status(200).json(response);
       }
-  
+
       findUser.password = newPassword;
       await findUser.save();
-  
+
       const response = {
         statusCode: 200,
         success: true,
         message: "Password is Reset Successfully",
       };
-  
+
       return res.status(200).json(response);
     } catch (error) {
       const response = {
@@ -389,16 +393,15 @@ const userController = {
     }
   },
   changePassword: async function (req, res) {
-
     try {
       const { oldPassword, newPassword } = req.body;
-  
+
       const user = await UserModel.findById(req.user?._id);
       // console.log(user);
-  
+
       const matchPasssword = await user.isPasswordCorrect(oldPassword);
       // console.log(matchPasssword);
-  
+
       if (!matchPasssword) {
         const response = {
           statusCode: 400,
@@ -407,10 +410,10 @@ const userController = {
         };
         return res.status(200).json(response);
       }
-  
+
       user.password = newPassword;
       await user.save({ validateBeforeSave: false }); //validation check ny kre
-  
+
       const response = {
         statusCode: 200,
         sucess: true,
@@ -446,7 +449,7 @@ const userController = {
   },
   changeProfilePic: async function (req, res) {
     try {
-      const user = await UserModel.findById(req.user?._id)
+      const user = await UserModel.findById(req.user?._id);
 
       if (!user) {
         const response = {
@@ -457,7 +460,7 @@ const userController = {
         return res.status(200).json(response);
       }
 
-      const profilePicLocalPath = req.file?.path
+      const profilePicLocalPath = req.file?.path;
 
       if (!profilePicLocalPath) {
         const response = {
@@ -469,15 +472,17 @@ const userController = {
       }
 
       if (user.publicUrl !== null) {
-        await fileDestroyInCloudinary(user.publicUrl)
+        await fileDestroyInCloudinary(user.publicUrl);
       }
 
-      const profilePicInCloudinary = await fileUploadInCloudinary(profilePicLocalPath);
+      const profilePicInCloudinary = await fileUploadInCloudinary(
+        profilePicLocalPath
+      );
 
       user.profilePic = profilePicInCloudinary.secure_url;
-      user.publicUrl = profilePicInCloudinary.public_id
+      user.publicUrl = profilePicInCloudinary.public_id;
 
-      await user.save()
+      await user.save();
 
       const response = {
         statusCode: 200,
@@ -485,7 +490,6 @@ const userController = {
         message: "Profile Picture Change Successfully",
       };
       return res.status(200).json(response);
-
     } catch (error) {
       const response = {
         statusCode: 501,
@@ -497,7 +501,7 @@ const userController = {
   },
   deleteProfilePic: async function (req, res) {
     try {
-      const user = await UserModel.findById(req.user?._id)
+      const user = await UserModel.findById(req.user?._id);
 
       if (!user) {
         const response = {
@@ -508,13 +512,13 @@ const userController = {
         return res.status(200).json(response);
       }
 
-      await fileDestroyInCloudinary(user.publicUrl)
+      await fileDestroyInCloudinary(user.publicUrl);
 
       const nameFirstLetter = user.name.toLowerCase().slice(0, 1);
       const url = publicUrl(nameFirstLetter);
-      user.profilePic = url
-      user.publicUrl = null
-      await user.save()
+      user.profilePic = url;
+      user.publicUrl = null;
+      await user.save();
 
       const response = {
         statusCode: 200,
@@ -522,8 +526,6 @@ const userController = {
         message: "Profile Pic Deleted Successfulyy",
       };
       return res.status(200).json(response);
-
-
     } catch (error) {
       const response = {
         statusCode: 501,
@@ -538,8 +540,8 @@ const userController = {
       const token = req.body.token;
       const ticket = await client.verifyIdToken({
         idToken: token,
-        audience: process.env.CLIENTID
-      })
+        audience: process.env.CLIENTID,
+      });
       let payload = ticket.getPayload();
       const findUser = await UserModel.findOne({ email: payload.email });
       if (findUser) {
@@ -558,7 +560,7 @@ const userController = {
         email: payload.email,
         image: result.secure_url,
         publicUrl: result.public_id,
-        isLogin: true
+        isLogin: true,
       });
       await newUser.save();
       const userData = newUser.getData();
@@ -592,36 +594,37 @@ const userController = {
   </tr>
 </table>
 
-      `
-      transporter.sendMail({
-        to: userData.email,
-        subject: "Home-Hub Market",
-        html: emailTemp
-      }, (err, info) => {
-        if (err) {
-
-        } else {
-          console.log("Email Sent : " + info.response);
+      `;
+      transporter.sendMail(
+        {
+          to: userData.email,
+          subject: "Home-Hub Market",
+          html: emailTemp,
+        },
+        (err, info) => {
+          if (err) {
+          } else {
+            console.log("Email Sent : " + info.response);
+          }
         }
-      })
-      const response = { 
+      );
+      const response = {
         statusCode: 201,
-        success: true, 
-        data: userData, 
-        message: "New User Created", 
-        token: userToken 
+        success: true,
+        data: userData,
+        message: "New User Created",
+        token: userToken,
       };
       return res.status(200).json(response);
-
     } catch (error) {
-      const response = { 
+      const response = {
         statusCode: 501,
-        success: false, 
-        message: error.message 
+        success: false,
+        message: error.message,
       };
-      return res.status(400).json(response)
+      return res.status(400).json(response);
     }
-  }
+  },
 };
 
 export { userController };

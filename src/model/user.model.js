@@ -7,7 +7,7 @@ const userSchema = new Schema(
     name: {
       type: String,
       required: true,
-      trim:true
+      trim: true,
     },
     email: {
       type: String,
@@ -19,27 +19,36 @@ const userSchema = new Schema(
           throw new Error("Validation Error");
         }
       },
-      trim:true
+      trim: true,
     },
     mobileNo: {
       type: String,
       required: true,
-      trim:true
+      trim: true,
+      validate(value) {
+        if (
+          !validator.isMobilePhone(value, "any", {
+            strictMode: false,
+          })
+        ) {
+          throw new Error("Validation Error");
+        }
+      },
     },
     password: {
       type: String,
       required: true,
-      trim:true
+      trim: true,
     },
     profilePic: {
       type: String,
       default: null,
-      trim:true
+      trim: true,
     },
     publicUrl: {
       type: String,
       default: null,
-      trim:true
+      trim: true,
     },
     role: {
       type: String,
@@ -49,17 +58,17 @@ const userSchema = new Schema(
       },
       required: true,
       default: "USER",
-      trim:true
+      trim: true,
     },
     isLogin: {
       type: Boolean,
       default: false,
-      trim:true
+      trim: true,
     },
   },
   { timestamps: true }
 );
-      
+
 userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
     const salt = bcrypt.genSaltSync(10);
