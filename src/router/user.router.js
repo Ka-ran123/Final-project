@@ -8,7 +8,7 @@ router.post('/sign-up' , userController.signUp);
 router.post('/sign-in' , userController.signIn);
 router.post('/verify-email' , userController.verifyEmail);
 router.post('/verify-otp' , userController.verifyOtp);
-router.post('/forgot-password' , userController.forgotPassword);
+router.post('/forget-password' , userController.forgetPassword);
 router.post('/reset-password',userController.resetPassword);
 router.post('/change-password',verifyUser,userController.changePassword);
 router.post('/change-profilePic' , verifyUser,upload.single('profilePic') ,userController.changeProfilePic)
