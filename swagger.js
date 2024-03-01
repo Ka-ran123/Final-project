@@ -386,3 +386,65 @@ export {swaggerDocs}
  *          200:
  *              description: All user cancelled property
  */
+
+
+// ***** Agent schema *****
+/**
+ * @swagger
+ *  components:
+ *      schemas:
+ *          addagent:
+ *              type: object
+ *              properties:
+ *                  name:
+ *                      type: string
+ *                  email:
+ *                      type: string
+ *                  mobileNo:
+ *                      type: string
+ *                  password:
+ *                      type: string
+ *                  age:
+ *                      type: string
+ *                  gender:
+ *                      type: string
+ *                  city:
+ *                      type: string
+ *                  state:
+ *                      type: string
+ *                  address:
+ *                      type: string
+ *                  bankName:
+ *                      type: string
+ *                  bankAccountNo:
+ *                      type: string
+ *                  ifscCode:
+ *                      type: string
+ *                  aadharCardPic:
+ *                      type: array
+ *                      items:
+ *                          type: string
+ *                          format: binary
+ *                  panCardPic:
+ *                      type: array
+ *                      items:
+ *                          type: string
+ *                          format: binary
+ */
+
+/**
+ * @swagger
+ * /api/v1/agent/add-agent:
+ *  post:
+ *      summary: add agent
+ *      description: add agent
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              multipart/form-data:
+ *                  schema:
+ *                      $ref: '#components/schemas/addagent'
+ *      responses:
+ *          200:
+ *              description: agent Add Successfully
+ */

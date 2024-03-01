@@ -1,11 +1,12 @@
 import { UserModel } from "../model/user.model.js";
+import { AgentModel } from "../model/agent.model.js";
 import { generateToken } from "../utils/genToken.js";
 import { transporter } from "../utils/nodemailer.js";
 import { generateOTP } from "../utils/genOtp.js";
 import { OtpModel } from "../model/otp.model.js";
 import { publicUrl } from "../utils/profilepic.js";
 import { fileDestroyInCloudinary, fileUploadInCloudinary } from "../utils/clodinary.js";
-const userController = {
+const UserController = {
   signUp: async function (req, res) {
     try {
       const data = req.body;
@@ -124,9 +125,13 @@ const userController = {
         return res.status(200).json(response);
       }
 
-      const findUser = await UserModel.findOne({ email: email });
+      const findUser = await UserModel.findOne({ email: email, role: "USER" });
 
-      if (!findUser) {
+      const findAdmin = await UserModel.findOne({ email: email, role: "ADMIN" });
+
+      const findAgent = await AgentModel.findOne({ email: email, role: "AGENT" });
+
+      if (!findUser && !findAdmin && !findAgent) {
         const response = {
           statusCode: 401,
           sucess: false,
@@ -135,9 +140,24 @@ const userController = {
         return res.status(200).json(response);
       }
 
-      const matchPasssword = await findUser.isPasswordCorrect(password);
+      let matchUserPasssword;
+      let matchAgentPasssword;
+      let matchAdminPasssword;
+      if (findUser) {
+        matchUserPasssword = await findUser.isPasswordCorrect(password);
 
-      if (!matchPasssword) {
+      }
+      else if (findAgent) {
+        matchAgentPasssword = await findAgent.isPasswordCorrect(password);
+
+      }
+      else {
+        matchAdminPasssword = await findAdmin.isPasswordCorrect(password);
+
+      }
+
+
+      if (!matchUserPasssword && !matchAdminPasssword && !matchAgentPasssword) {
         const response = {
           statusCode: 401,
           sucess: false,
@@ -146,24 +166,57 @@ const userController = {
         return res.status(200).json(response);
       }
 
-      const user = await UserModel.findById(findUser._id).select(
-        "-password -publicUrl"
-      );
-      const token = generateToken({ id: findUser._id });
-
       const options = {
         httpOnly: true,
         secure: true,
       };
 
-      const response = {
-        statusCode: 201,
-        success: true,
-        token: token,
-        user,
-        message: "User logged In Successfully",
-      };
-      return res.status(200).cookie("Token", token, options).json(response);
+      if (findUser) {
+        const user = await UserModel.findById(findUser._id).select(
+          "-password -publicUrl"
+        );
+        const userToken = generateToken({ id: findUser._id });
+        const response = {
+          statusCode: 201,
+          success: true,
+          token: userToken,
+          user,
+          message: "User logged In Successfully",
+        };
+        return res.status(200).cookie("Token", userToken, options).json(response);
+      }
+      else if (findAgent) {
+        const agent = await AgentModel.findById(findAgent._id).select(
+          "-password -publicUrl"
+        );
+        const agentToken = generateToken({ id: findAgent._id });
+
+        const response = {
+          statusCode: 201,
+          success: true,
+          token: agentToken,
+          agent,
+          message: "Agent logged In Successfully",
+        };
+        return res.status(200).cookie("Token", agentToken, options).json(response);
+      }
+      else {
+        const admin = await UserModel.findById(findAdmin._id).select(
+          "-password -publicUrl"
+        );
+        const adminToken = generateToken({ id: findAdmin._id });
+
+        const response = {
+          statusCode: 201,
+          success: true,
+          token: adminToken,
+          admin,
+          message: "Admin logged In Successfully",
+        };
+        return res.status(200).cookie("Token", adminToken, options).json(response);
+      }
+
+
     } catch (error) {
       const response = {
         statusCode: 501,
@@ -355,7 +408,7 @@ const userController = {
     }
   },
   resetPassword: async function (req, res) {
-    
+
     try {
       const { email, newPassword } = req.body;
       const findUser = await UserModel.findOne({ email });
@@ -367,16 +420,16 @@ const userController = {
         };
         return res.status(200).json(response);
       }
-  
+
       findUser.password = newPassword;
       await findUser.save();
-  
+
       const response = {
         statusCode: 200,
         success: true,
         message: "Password is Reset Successfully",
       };
-  
+
       return res.status(200).json(response);
     } catch (error) {
       const response = {
@@ -391,13 +444,13 @@ const userController = {
 
     try {
       const { oldPassword, newPassword } = req.body;
-  
+
       const user = await UserModel.findById(req.user?._id);
       // console.log(user);
-  
+
       const matchPasssword = await user.isPasswordCorrect(oldPassword);
       // console.log(matchPasssword);
-  
+
       if (!matchPasssword) {
         const response = {
           statusCode: 400,
@@ -406,10 +459,10 @@ const userController = {
         };
         return res.status(200).json(response);
       }
-  
+
       user.password = newPassword;
       await user.save({ validateBeforeSave: false }); //validation check ny kre
-  
+
       const response = {
         statusCode: 200,
         sucess: true,
@@ -555,7 +608,7 @@ const userController = {
       const newUser = new UserModel({
         name: payload.name,
         email: payload.email,
-        image: result.secure_url,
+        profilePic: result.secure_url,
         publicUrl: result.public_id,
         isLogin: true
       });
@@ -603,24 +656,24 @@ const userController = {
           console.log("Email Sent : " + info.response);
         }
       })
-      const response = { 
+      const response = {
         statusCode: 201,
-        success: true, 
-        data: userData, 
-        message: "New User Created", 
-        token: userToken 
+        success: true,
+        data: userData,
+        message: "New User Created",
+        token: userToken
       };
       return res.status(200).json(response);
 
     } catch (error) {
-      const response = { 
+      const response = {
         statusCode: 501,
-        success: false, 
-        message: error.message 
+        success: false,
+        message: error.message
       };
       return res.status(400).json(response)
     }
   }
 };
 
-export { userController };
+export { UserController };

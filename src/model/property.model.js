@@ -104,6 +104,10 @@ const propertySchema = new Schema({
     type: String,
     required: true,
   },
+  date: {
+    type: Date,
+    default: Date.now()
+  },
   agentId:{
     type:mongoose.Schema.Types.ObjectId,
     // ref:'user',
