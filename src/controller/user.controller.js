@@ -214,7 +214,7 @@ const userController = {
         html: mailFormat,
       };
 
-      transporter.sendMail(mailOptions, async (err, info) => {
+     await transporter.sendMail(mailOptions, async (err, info) => {
         if (err) {
           const response = {
             statusCode: 400,
