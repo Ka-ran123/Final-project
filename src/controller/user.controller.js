@@ -1,6 +1,6 @@
 import { UserModel } from "../model/user.model.js";
 import { generateToken } from "../utils/genToken.js";
-import { transporter } from "../utils/nodemailer.js";
+import { transporter, sendEmail } from "../utils/nodemailer.js";
 import { generateOTP } from "../utils/genOtp.js";
 import { OtpModel } from "../model/otp.model.js";
 import { publicUrl } from "../utils/profilepic.js";
@@ -214,24 +214,32 @@ const userController = {
         html: mailFormat,
       };
 
-     await transporter.sendMail(mailOptions, async (err, info) => {
-        if (err) {
-          const response = {
-            statusCode: 400,
-            sucess: false,
-            message: err.message,
-          };
-          return res.status(200).json(response);
-        } else {
-          await OtpModel.findOneAndDelete({ email: email });
-          const user = new OtpModel({ email: email, otp: otp });
-          await user.save();
+      //  await transporter.sendMail(mailOptions, async (err, info) => {
+      //     if (err) {
+      //       const response = {
+      //         statusCode: 400,
+      //         sucess: false,
+      //         message: err.message,
+      //       };
+      //       return res.status(200).json(response);
+      //     } else {
+      //       await OtpModel.findOneAndDelete({ email: email });
+      //       const user = new OtpModel({ email: email, otp: otp });
+      //       await user.save();
 
-          setTimeout(async () => {
-            await OtpModel.findOneAndDelete({ email: email });
-          }, 1000 * 60);
-        }
-      });
+      //       setTimeout(async () => {
+      //         await OtpModel.findOneAndDelete({ email: email });
+      //       }, 1000 * 60);
+      //     }
+      //   });
+      await sendEmail(mailOptions);
+      await OtpModel.findOneAndDelete({ email: email });
+      const user = new OtpModel({ email: email, otp: otp });
+      await user.save();
+
+      setTimeout(async () => {
+        await OtpModel.findOneAndDelete({ email: email });
+      }, 1000 * 60);
 
       const response = {
         statusCode: 201,

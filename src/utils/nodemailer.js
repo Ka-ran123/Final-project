@@ -43,3 +43,13 @@ export const transporter = nodemailer.createTransport(
   },
   { sendmail: true }
 );
+
+export async function sendEmail(mailOptions) {
+  await transporter.verify(async (error) => {
+    if (error) {
+      return { error: error.message };
+    }
+  });
+  const emailResponse = await transporter.sendMail(mailOptions);
+  return { result: "Email sent successfully" };
+}
