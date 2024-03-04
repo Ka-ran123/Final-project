@@ -283,7 +283,7 @@ const userController = {
       await OtpModel.findOneAndDelete({ email: findUser.email });
 
       const response = {
-        statusCode: 201,
+        statusCode: 200,
         sucess: true,
         message: "OTP is Right",
       };
