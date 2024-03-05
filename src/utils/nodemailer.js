@@ -21,11 +21,11 @@ import nodemailer from "nodemailer";
 // })
 
 const smtpConfig = {
-  EMAIL: "homehubmarket123@gmail.com",
-  PASSWORD: "qxod wqaj spoq tjav",
+  EMAIL: "karanunagar123@gmail.com",
+  PASSWORD: "sdqe vixp jjoc dmii",
   HOST: "smtp.gmail.com",
   PORT: 587,
-  FROM_EMAIL: "homehubmarket123@gmail.com",
+  FROM_EMAIL: "karanunagar123@gmail.com",
 };
 
 export const transporter = nodemailer.createTransport(

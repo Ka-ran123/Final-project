@@ -232,6 +232,7 @@ const userController = {
       //       }, 1000 * 60);
       //     }
       //   });
+      
       await sendEmail(mailOptions);
       await OtpModel.findOneAndDelete({ email: email });
       const user = new OtpModel({ email: email, otp: otp });
