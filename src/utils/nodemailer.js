@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import {EMAIL,PASSWORD}from "../config/config.js"
 // import {
 //   UNAME,
 //   PASSWORD,
@@ -21,11 +22,11 @@ import nodemailer from "nodemailer";
 // })
 
 const smtpConfig = {
-  EMAIL: "karanunagar123@gmail.com",
-  PASSWORD: "sdqe vixp jjoc dmii",
+  EMAIL:EMAIL,
+  PASSWORD:PASSWORD,
   HOST: "smtp.gmail.com",
   PORT: 587,
-  FROM_EMAIL: "karanunagar123@gmail.com",
+  FROM_EMAIL: EMAIL,
 };
 
 export const transporter = nodemailer.createTransport(
