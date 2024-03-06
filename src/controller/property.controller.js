@@ -9,6 +9,7 @@ const PropertyController = {
   addProperty: async (req, res) => {
     try {
       const user = await UserModel.findById(req.user?._id);
+      console.log(user);
       if (!user) {
         const response = {
           statusCode: 401,
@@ -19,6 +20,7 @@ const PropertyController = {
       }
 
       const data = req.body;
+
          
       if (user.email !== data.email && user.mobileNo !== data.mobileNo) {
         const response = {
