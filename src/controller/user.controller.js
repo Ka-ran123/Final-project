@@ -232,7 +232,7 @@ const userController = {
       //       }, 1000 * 60);
       //     }
       //   });
-      
+
       await sendEmail(mailOptions);
       await OtpModel.findOneAndDelete({ email: email });
       const user = new OtpModel({ email: email, otp: otp });
@@ -343,23 +343,35 @@ const userController = {
         html: mailFormat,
       };
 
-      transporter.sendMail(mailOptions, async (error, info) => {
-        if (error) {
-          const response = { success: false, message: error.message };
-          return res.status(400).json(response);
-        } else {
-          await OtpModel.findOneAndDelete({ email: findUser.email });
-          const user = new OtpModel({ email: findUser.email, otp: otp });
-          await user.save();
+      // transporter.sendMail(mailOptions, async (error, info) => {
+      //   if (error) {
+      //     const response = { success: false, message: error.message };
+      //     return res.status(400).json(response);
+      //   } else {
+      //     await OtpModel.findOneAndDelete({ email: findUser.email });
+      //     const user = new OtpModel({ email: findUser.email, otp: otp });
+      //     await user.save();
 
-          setTimeout(async () => {
-            await OtpModel.findOneAndDelete({ email: findUser.email });
-          }, 1000 * 60);
+      //     setTimeout(async () => {
+      //       await OtpModel.findOneAndDelete({ email: findUser.email });
+      //     }, 1000 * 60);
 
-          const response = { success: true, message: "Otp Send" };
-          return res.status(200).json(response);
-        }
-      });
+      //     const response = { success: true, message: "Otp Send" };
+      //     return res.status(200).json(response);
+      //   }
+      // });
+
+      await sendEmail(mailOptions);
+      await OtpModel.findOneAndDelete({ email: findUser.email });
+      const user = new OtpModel({ email: findUser.email, otp: otp });
+      await user.save();
+
+      setTimeout(async () => {
+        await OtpModel.findOneAndDelete({ email: findUser.email });
+      }, 1000 * 60);
+
+      const response = { success: true, message: "Otp Send" };
+      return res.status(200).json(response);
     } catch (error) {
       const response = {
         statusCode: 501,
@@ -604,19 +616,24 @@ const userController = {
 </table>
 
       `;
-      transporter.sendMail(
-        {
-          to: userData.email,
-          subject: "Home-Hub Market",
-          html: emailTemp,
-        },
-        (err, info) => {
-          if (err) {
-          } else {
-            console.log("Email Sent : " + info.response);
-          }
-        }
-      );
+      // transporter.sendMail(
+      //   {
+      //     to: userData.email,
+      //     subject: "Home-Hub Market",
+      //     html: emailTemp,
+      //   },
+      //   (err, info) => {
+      //     if (err) {
+      //     } else {
+      //       console.log("Email Sent : " + info.response);
+      //     }
+      //   }
+      // );
+      await sendEmail({
+            to: userData.email,
+            subject: "Home-Hub Market",
+            html: emailTemp,
+          });
       const response = {
         statusCode: 201,
         success: true,
