@@ -84,7 +84,7 @@ const propertySchema = new Schema({
   houseType: {
     type: String,
     enum: {
-      values: ["1Rk", "1BK", "2BHK", "3+BHK"],
+      values: ["1Rk", "1BHK", "2BHK", "3+BHK"],
       message: "Plz ! Select One..!",
     },
     required: true,

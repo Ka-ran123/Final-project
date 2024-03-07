@@ -371,7 +371,7 @@ const userController = {
         await OtpModel.findOneAndDelete({ email: findUser.email });
       }, 1000 * 60);
 
-      const response = { success: true, message: "Otp Send" };
+      const response = { statusCode: 200, success: true, message: "Otp Send" };
       return res.status(200).json(response);
     } catch (error) {
       const response = {
