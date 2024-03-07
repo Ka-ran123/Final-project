@@ -20,6 +20,7 @@ const PropertyController = {
       }
 
       const data = req.body;
+      console.log(data);
 
          
       if (user.email !== data.email && user.mobileNo !== data.mobileNo) {

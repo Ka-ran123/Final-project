@@ -8,6 +8,7 @@ import {
   fileDestroyInCloudinary,
   fileUploadInCloudinary,
 } from "../utils/clodinary.js";
+
 const userController = {
   signUp: async function (req, res) {
     try {
@@ -121,7 +122,7 @@ const userController = {
     try {
       const { email, password } = req.body;
 
-      if ((email && password) === "") {
+      if ((email && password) === undefined) {
         const response = {
           statusCode: 401,
           sucess: false,
@@ -630,10 +631,10 @@ const userController = {
       //   }
       // );
       await sendEmail({
-            to: userData.email,
-            subject: "Home-Hub Market",
-            html: emailTemp,
-          });
+        to: userData.email,
+        subject: "Home-Hub Market",
+        html: emailTemp,
+      });
       const response = {
         statusCode: 201,
         success: true,
