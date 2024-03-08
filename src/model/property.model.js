@@ -110,7 +110,7 @@ const propertySchema = new Schema({
   },
   agentId:{
     type:mongoose.Schema.Types.ObjectId,
-    // ref:'user',
+    ref:'agent',
     default:null,
   }
 

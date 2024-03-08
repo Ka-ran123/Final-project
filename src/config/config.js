@@ -7,7 +7,7 @@ export const DB_ATLAS=process.env.DB_ATLAS
 
 export const JWT_SECRET_KEY=process.env.JWT_SECRET_KEY
 
-export const UNAME=process.env.UNAME
+export const EMAIL=process.env.EMAIL
 
 export const PASSWORD=process.env.PASSWORD
 
