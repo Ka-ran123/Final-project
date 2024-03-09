@@ -110,8 +110,7 @@ const propertySchema = new Schema({
       values: ["approval", "cancle", "pending"],
       message: "Plz ! Select One..!",
     },
-    required: true,
-    trim:true
+    default: "pending"
   },
   mobileNo: {
     type: String,
@@ -123,9 +122,13 @@ const propertySchema = new Schema({
     required: true,
     trim:true
   },
+  date: {
+    type: Date,
+    default: Date.now()
+  },
   agentId:{
     type:mongoose.Schema.Types.ObjectId,
-    // ref:'user',
+    ref:'agent',
     default:null,
   },
   isRent:{

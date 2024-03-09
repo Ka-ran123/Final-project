@@ -1,15 +1,12 @@
 import { UserModel } from "../model/user.model.js";
+import { AgentModel } from "../model/agent.model.js";
 import { generateToken } from "../utils/genToken.js";
-import { transporter, sendEmail } from "../utils/nodemailer.js";
+import { transporter,sendEmail } from "../utils/nodemailer.js";
 import { generateOTP } from "../utils/genOtp.js";
 import { OtpModel } from "../model/otp.model.js";
 import { publicUrl } from "../utils/profilepic.js";
-import {
-  fileDestroyInCloudinary,
-  fileUploadInCloudinary,
-} from "../utils/clodinary.js";
-
-const userController = {
+import { fileDestroyInCloudinary, fileUploadInCloudinary } from "../utils/clodinary.js";
+const UserController = {
   signUp: async function (req, res) {
     try {
       const data = req.body;
@@ -131,9 +128,13 @@ const userController = {
         return res.status(200).json(response);
       }
 
-      const findUser = await UserModel.findOne({ email: email });
+      const findUser = await UserModel.findOne({ email: email, role: "USER" });
 
-      if (!findUser) {
+      const findAdmin = await UserModel.findOne({ email: email, role: "ADMIN" });
+
+      const findAgent = await AgentModel.findOne({ email: email, role: "AGENT" });
+
+      if (!findUser && !findAdmin && !findAgent) {
         const response = {
           statusCode: 401,
           sucess: false,
@@ -142,9 +143,24 @@ const userController = {
         return res.status(200).json(response);
       }
 
-      const matchPasssword = await findUser.isPasswordCorrect(password);
+      let matchUserPasssword;
+      let matchAgentPasssword;
+      let matchAdminPasssword;
+      if (findUser) {
+        matchUserPasssword = await findUser.isPasswordCorrect(password);
 
-      if (!matchPasssword) {
+      }
+      else if (findAgent) {
+        matchAgentPasssword = await findAgent.isPasswordCorrect(password);
+
+      }
+      else {
+        matchAdminPasssword = await findAdmin.isPasswordCorrect(password);
+
+      }
+
+
+      if (!matchUserPasssword && !matchAdminPasssword && !matchAgentPasssword) {
         const response = {
           statusCode: 401,
           sucess: false,
@@ -153,24 +169,57 @@ const userController = {
         return res.status(200).json(response);
       }
 
-      const user = await UserModel.findById(findUser._id).select(
-        "-password -publicUrl"
-      );
-      const token = generateToken({ id: findUser._id });
-
       const options = {
         httpOnly: true,
         secure: true,
       };
 
-      const response = {
-        statusCode: 201,
-        success: true,
-        token: token,
-        user,
-        message: "User logged In Successfully",
-      };
-      return res.status(200).cookie("Token", token, options).json(response);
+      if (findUser) {
+        const user = await UserModel.findById(findUser._id).select(
+          "-password -publicUrl"
+        );
+        const userToken = generateToken({ id: findUser._id });
+        const response = {
+          statusCode: 201,
+          success: true,
+          token: userToken,
+          user,
+          message: "User logged In Successfully",
+        };
+        return res.status(200).cookie("Token", userToken, options).json(response);
+      }
+      else if (findAgent) {
+        const agent = await AgentModel.findById(findAgent._id).select(
+          "-password -publicUrl"
+        );
+        const agentToken = generateToken({ id: findAgent._id });
+
+        const response = {
+          statusCode: 201,
+          success: true,
+          token: agentToken,
+          agent,
+          message: "Agent logged In Successfully",
+        };
+        return res.status(200).cookie("Token", agentToken, options).json(response);
+      }
+      else {
+        const admin = await UserModel.findById(findAdmin._id).select(
+          "-password -publicUrl"
+        );
+        const adminToken = generateToken({ id: findAdmin._id });
+
+        const response = {
+          statusCode: 201,
+          success: true,
+          token: adminToken,
+          admin,
+          message: "Admin logged In Successfully",
+        };
+        return res.status(200).cookie("Token", adminToken, options).json(response);
+      }
+
+
     } catch (error) {
       const response = {
         statusCode: 501,
@@ -215,24 +264,24 @@ const userController = {
         html: mailFormat,
       };
 
-      //  await transporter.sendMail(mailOptions, async (err, info) => {
-      //     if (err) {
-      //       const response = {
-      //         statusCode: 400,
-      //         sucess: false,
-      //         message: err.message,
-      //       };
-      //       return res.status(200).json(response);
-      //     } else {
-      //       await OtpModel.findOneAndDelete({ email: email });
-      //       const user = new OtpModel({ email: email, otp: otp });
-      //       await user.save();
+      // transporter.sendMail(mailOptions, async (err, info) => {
+      //   if (err) {
+      //     const response = {
+      //       statusCode: 400,
+      //       sucess: false,
+      //       message: err.message,
+      //     };
+      //     return res.status(200).json(response);
+      //   } else {
+      //     await OtpModel.findOneAndDelete({ email: email });
+      //     const user = new OtpModel({ email: email, otp: otp });
+      //     await user.save();
 
-      //       setTimeout(async () => {
-      //         await OtpModel.findOneAndDelete({ email: email });
-      //       }, 1000 * 60);
-      //     }
-      //   });
+      //     setTimeout(async () => {
+      //       await OtpModel.findOneAndDelete({ email: email });
+      //     }, 1000 * 60);
+      //   }
+      // });
 
       await sendEmail(mailOptions);
       await OtpModel.findOneAndDelete({ email: email });
@@ -580,7 +629,7 @@ const userController = {
       const newUser = new UserModel({
         name: payload.name,
         email: payload.email,
-        image: result.secure_url,
+        profilePic: result.secure_url,
         publicUrl: result.public_id,
         isLogin: true,
       });
@@ -633,25 +682,31 @@ const userController = {
       await sendEmail({
         to: userData.email,
         subject: "Home-Hub Market",
-        html: emailTemp,
-      });
+        html: emailTemp
+      }, (err, info) => {
+        if (err) {
+
+        } else {
+          console.log("Email Sent : " + info.response);
+        }
+      })
       const response = {
         statusCode: 201,
         success: true,
         data: userData,
         message: "New User Created",
-        token: userToken,
+        token: userToken
       };
       return res.status(200).json(response);
     } catch (error) {
       const response = {
         statusCode: 501,
         success: false,
-        message: error.message,
+        message: error.message
       };
       return res.status(400).json(response);
     }
   },
 };
 
-export { userController };
+export { UserController };

@@ -9,7 +9,7 @@ const options={
           version: '1.0.0',
         },
         servers:[{
-            url: 'http://localhost:5432'
+            url: 'http://localhost:8000'
         }]
     },
     apis:['swagger.js']
@@ -22,7 +22,7 @@ const swaggerDocs=function swaggerDocs(app){
 }
 export {swaggerDocs}
 
-//Auth schema
+// ***** Auth schema *****
 /**
  * @swagger
  *  components:
@@ -262,4 +262,189 @@ export {swaggerDocs}
  *      responses:
  *          200:
  *              description: login successfully
+ */
+
+
+
+// ***** Property schema *****
+/**
+ * @swagger
+ *  components:
+ *      schemas:
+ *          addproperty:
+ *              type: object
+ *              properties:
+ *                  type:
+ *                      type: string
+ *                  description:
+ *                      type: string
+ *                  propertyImage:
+ *                      type: array
+ *                      items:
+ *                          type: string
+ *                          format: binary
+ *                  address:
+ *                      type: string
+ *                  state:
+ *                      type: string
+ *                  city:
+ *                      type: string
+ *                  size:
+ *                      type: string
+ *                  price:
+ *                      type: string
+ *                  propertyAge:
+ *                      type: string
+ *                  floorNo:
+ *                      type: string
+ *                  rooms:
+ *                      type: string
+ *                  propertyType:
+ *                      type: string
+ *                  faching:
+ *                      type: string
+ *                  houseType:
+ *                      type: string
+ *                  facility:
+ *                      type: string
+ *                  furnishing:
+ *                      type: string
+ *                  mobileNo:
+ *                      type: string
+ *                  email:
+ *                      type: string
+ */
+
+/**
+ * @swagger
+ * /api/v1/property/add-property:
+ *  post:
+ *      summary: add property for rent or sell
+ *      description: add property for rent or sell
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              multipart/form-data:
+ *                  schema:
+ *                      $ref: '#components/schemas/addproperty'
+ *      responses:
+ *          200:
+ *              description: Property Add Successfully
+ */
+
+/**
+ * @swagger
+ * /api/v1/property/getall-property:
+ *  get:
+ *      summary: get all property for verification
+ *      description: get all property for verification
+ *      responses:
+ *          200:
+ *              description: All property show
+ */
+
+/**
+ * @swagger
+ * /api/v1/property/getuserall-property:
+ *  get:
+ *      summary: get user added all property 
+ *      description: get user added all property 
+ *      responses:
+ *          200:
+ *              description: All user property
+ */
+
+/**
+ * @swagger
+ * /api/v1/property/getuserpending-property:
+ *  get:
+ *      summary: get user added but verification pending all property 
+ *      description: get user added but verification pending all property 
+ *      responses:
+ *          200:
+ *              description: All user pending property
+ */
+
+/**
+ * @swagger
+ * /api/v1/property/getuserapproval-property:
+ *  get:
+ *      summary: get user added approval all property 
+ *      description: get user added approval all property 
+ *      responses:
+ *          200:
+ *              description: All user approval property
+ */
+
+/**
+ * @swagger
+ * /api/v1/property/getusercancel-property:
+ *  get:
+ *      summary: get user added but verification time cancelled property 
+ *      description: get user added but verification time cancelled property 
+ *      responses:
+ *          200:
+ *              description: All user cancelled property
+ */
+
+
+// ***** Agent schema *****
+/**
+ * @swagger
+ *  components:
+ *      schemas:
+ *          addagent:
+ *              type: object
+ *              properties:
+ *                  name:
+ *                      type: string
+ *                  email:
+ *                      type: string
+ *                  mobileNo:
+ *                      type: string
+ *                  password:
+ *                      type: string
+ *                  age:
+ *                      type: string
+ *                  gender:
+ *                      type: string
+ *                  city:
+ *                      type: string
+ *                  state:
+ *                      type: string
+ *                  address:
+ *                      type: string
+ *                  bankName:
+ *                      type: string
+ *                  bankAccountNo:
+ *                      type: string
+ *                  ifscCode:
+ *                      type: string
+ *                  aadharCardPic:
+ *                      type: array
+ *                      items:
+ *                          type: string
+ *                          format: binary
+ *                  panCardPic:
+ *                      type: array
+ *                      items:
+ *                          type: string
+ *                          format: binary
+ */
+
+/**
+ * @swagger
+ * /api/v1/agent/add-agent:
+ *  post:
+ *      summary: add agent
+ *      description: add agent
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              multipart/form-data:
+ *                  schema:
+ *                      $ref: '#components/schemas/addagent'
+ *      responses:
+ *          200:
+ *              description: agent Add Successfully
  */
