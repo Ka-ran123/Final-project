@@ -348,7 +348,7 @@ const UserController = {
       return res.status(200).json(response);
     }
   },
-  forgetPassword: async function (req, res) {
+  forgotPassword: async function (req, res) {
     try {
       const { email } = req.body;
       const findUser = await UserModel.findOne({ email });
