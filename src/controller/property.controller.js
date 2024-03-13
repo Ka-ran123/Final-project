@@ -312,9 +312,9 @@ const PropertyController = {
       return res.status(200).json(response);
     }
   },
-  getOnlyBuyProperty:async (req,res)=>{
+  getOnlyRentProperty:async (req,res)=>{
     try {
-      const allProperty = await PropertyModel.find({type:{$eq:'Buy'}});
+      const allProperty = await PropertyModel.find({type:{$eq:'Rent'}});
       if (!allProperty) {
         const response = {
           statusCode: 400,
@@ -327,7 +327,7 @@ const PropertyController = {
         statusCode: 200,
         sucess: true,
         allProperty,
-        message: "All Buy Property Show",
+        message: "All Rent Property Show",
       };
       return res.status(200).json(response);
     } catch (error) {

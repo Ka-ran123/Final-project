@@ -14,7 +14,7 @@ router.get('/getuserapproval-property' , verifyUser, PropertyController.getUserA
 router.get('/getusercancel-property' , verifyUser, PropertyController.getUserCancelProperty)
 router.get('/getall-property-app', PropertyController.getAllPropertyForApp)
 router.get('/getall-sellproperty-app', PropertyController.getOnlySellProperty)
-router.get('/getall-buyproperty-app', PropertyController.getOnlyBuyProperty)
+router.get('/getall-rentproperty-app', PropertyController.getOnlyRentProperty)
 
 
 export const propertyRouter = router
