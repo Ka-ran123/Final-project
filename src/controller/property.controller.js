@@ -10,7 +10,7 @@ const PropertyController = {
   addProperty: async (req, res) => {
     try {
       const user = await UserModel.findById(req.user?._id);
-      console.log(user);
+      // console.log(user);
       if (!user) {
         const response = {
           statusCode: 401,
@@ -20,11 +20,9 @@ const PropertyController = {
         return res.status(200).json(response);
       }
 
-
       const data = req.body;
-      console.log(data);
+      // console.log(data);
 
-         
       if (user.email !== data.email && user.mobileNo !== data.mobileNo) {
         const response = {
           statusCode: 400,
@@ -33,7 +31,7 @@ const PropertyController = {
         };
         return res.status(200).json(response);
       }
-       
+
       if (req.files === undefined) {
         const response = {
           statusCode: 400,
@@ -42,7 +40,7 @@ const PropertyController = {
         };
         return res.status(200).json(response);
       }
-     
+
       const image = [];
       for (let i = 0; i < req.files.length; i++) {
         let result = await fileUploadInCloudinary(req.files[i].path);
@@ -55,17 +53,20 @@ const PropertyController = {
 
       let agentId;
       if (!findAgent) {
-        const findAgent = await AgentModel.find().sort({date:-1});
+        const findAgent = await AgentModel.find().sort({ date: -1 });
         agentId = findAgent[0]._id;
-      }
-      else {
+      } else {
         agentId = findAgent._id;
       }
-      
+
       data.propertyImage = image;
       data.facility = data.facility.split(",");
 
-      const propertyData = new PropertyModel({ ...data, userId: user._id ,agentId});
+      const propertyData = new PropertyModel({
+        ...data,
+        userId: user._id,
+        agentId,
+      });
 
       await propertyData.save();
 
@@ -97,7 +98,7 @@ const PropertyController = {
         return res.status(200).json(response);
       }
 
-      if (user.role === 'USER') {
+      if (user.role === "USER") {
         const response = {
           statusCode: 400,
           success: false,
@@ -106,6 +107,33 @@ const PropertyController = {
         return res.status(200).json(response);
       }
 
+      const allProperty = await PropertyModel.find();
+      if (!allProperty) {
+        const response = {
+          statusCode: 400,
+          sucess: false,
+          message: "Bad Request",
+        };
+        return res.status(200).json(response);
+      }
+      const response = {
+        statusCode: 200,
+        sucess: true,
+        allProperty,
+        message: "All Property Show",
+      };
+      return res.status(200).json(response);
+    } catch (error) {
+      const response = {
+        statusCode: 501,
+        sucess: false,
+        message: error.message,
+      };
+      return res.status(200).json(response);
+    }
+  },
+  getAllPropertyForApp: async (req, res) => {
+    try {
       const allProperty = await PropertyModel.find();
       if (!allProperty) {
         const response = {
@@ -173,7 +201,9 @@ const PropertyController = {
         return res.status(200).json(response);
       }
 
-      const propertyData = await PropertyModel.find({ $and: [{ userId: user._id }, { status: 'pending' }] });
+      const propertyData = await PropertyModel.find({
+        $and: [{ userId: user._id }, { status: "pending" }],
+      });
 
       const response = {
         statusCode: 200,
@@ -203,7 +233,9 @@ const PropertyController = {
         return res.status(200).json(response);
       }
 
-      const propertyData = await PropertyModel.find({ $and: [{ userId: user._id }, { status: 'approval' }] });
+      const propertyData = await PropertyModel.find({
+        $and: [{ userId: user._id }, { status: "approval" }],
+      });
 
       const response = {
         statusCode: 200,
@@ -233,7 +265,9 @@ const PropertyController = {
         return res.status(200).json(response);
       }
 
-      const propertyData = await PropertyModel.find({ $and: [{ userId: user._id }, { status: 'cancle' }] });
+      const propertyData = await PropertyModel.find({
+        $and: [{ userId: user._id }, { status: "cancle" }],
+      });
 
       const response = {
         statusCode: 200,
@@ -250,7 +284,7 @@ const PropertyController = {
       };
       return res.status(200).json(response);
     }
-  }
+  },
 };
-     
+
 export { PropertyController };

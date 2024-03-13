@@ -1,11 +1,14 @@
 import { UserModel } from "../model/user.model.js";
 import { AgentModel } from "../model/agent.model.js";
 import { generateToken } from "../utils/genToken.js";
-import { transporter,sendEmail } from "../utils/nodemailer.js";
+import { transporter, sendEmail } from "../utils/nodemailer.js";
 import { generateOTP } from "../utils/genOtp.js";
 import { OtpModel } from "../model/otp.model.js";
 import { publicUrl } from "../utils/profilepic.js";
-import { fileDestroyInCloudinary, fileUploadInCloudinary } from "../utils/clodinary.js";
+import {
+  fileDestroyInCloudinary,
+  fileUploadInCloudinary,
+} from "../utils/clodinary.js";
 const UserController = {
   signUp: async function (req, res) {
     try {
@@ -130,9 +133,15 @@ const UserController = {
 
       const findUser = await UserModel.findOne({ email: email, role: "USER" });
 
-      const findAdmin = await UserModel.findOne({ email: email, role: "ADMIN" });
+      const findAdmin = await UserModel.findOne({
+        email: email,
+        role: "ADMIN",
+      });
 
-      const findAgent = await AgentModel.findOne({ email: email, role: "AGENT" });
+      const findAgent = await AgentModel.findOne({
+        email: email,
+        role: "AGENT",
+      });
 
       if (!findUser && !findAdmin && !findAgent) {
         const response = {
@@ -148,17 +157,11 @@ const UserController = {
       let matchAdminPasssword;
       if (findUser) {
         matchUserPasssword = await findUser.isPasswordCorrect(password);
-
-      }
-      else if (findAgent) {
+      } else if (findAgent) {
         matchAgentPasssword = await findAgent.isPasswordCorrect(password);
-
-      }
-      else {
+      } else {
         matchAdminPasssword = await findAdmin.isPasswordCorrect(password);
-
       }
-
 
       if (!matchUserPasssword && !matchAdminPasssword && !matchAgentPasssword) {
         const response = {
@@ -186,9 +189,11 @@ const UserController = {
           user,
           message: "User logged In Successfully",
         };
-        return res.status(200).cookie("Token", userToken, options).json(response);
-      }
-      else if (findAgent) {
+        return res
+          .status(200)
+          .cookie("Token", userToken, options)
+          .json(response);
+      } else if (findAgent) {
         const agent = await AgentModel.findById(findAgent._id).select(
           "-password -publicUrl"
         );
@@ -201,9 +206,11 @@ const UserController = {
           agent,
           message: "Agent logged In Successfully",
         };
-        return res.status(200).cookie("Token", agentToken, options).json(response);
-      }
-      else {
+        return res
+          .status(200)
+          .cookie("Token", agentToken, options)
+          .json(response);
+      } else {
         const admin = await UserModel.findById(findAdmin._id).select(
           "-password -publicUrl"
         );
@@ -216,10 +223,11 @@ const UserController = {
           admin,
           message: "Admin logged In Successfully",
         };
-        return res.status(200).cookie("Token", adminToken, options).json(response);
+        return res
+          .status(200)
+          .cookie("Token", adminToken, options)
+          .json(response);
       }
-
-
     } catch (error) {
       const response = {
         statusCode: 501,
@@ -679,30 +687,32 @@ const UserController = {
       //     }
       //   }
       // );
-      await sendEmail({
-        to: userData.email,
-        subject: "Home-Hub Market",
-        html: emailTemp
-      }, (err, info) => {
-        if (err) {
-
-        } else {
-          console.log("Email Sent : " + info.response);
+      await sendEmail(
+        {
+          to: userData.email,
+          subject: "Home-Hub Market",
+          html: emailTemp,
+        },
+        (err, info) => {
+          if (err) {
+          } else {
+            console.log("Email Sent : " + info.response);
+          }
         }
-      })
+      );
       const response = {
         statusCode: 201,
         success: true,
         data: userData,
         message: "New User Created",
-        token: userToken
+        token: userToken,
       };
       return res.status(200).json(response);
     } catch (error) {
       const response = {
         statusCode: 501,
         success: false,
-        message: error.message
+        message: error.message,
       };
       return res.status(400).json(response);
     }

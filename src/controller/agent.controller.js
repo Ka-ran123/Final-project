@@ -3,60 +3,67 @@ import { UserModel } from "../model/user.model.js";
 import { generateToken } from "../utils/genToken.js";
 import { publicUrl } from "../utils/profilepic.js";
 import { transporter, sendEmail } from "../utils/nodemailer.js";
-import { fileDestroyInCloudinary, fileUploadInCloudinary } from "../utils/clodinary.js";
+import {
+  fileDestroyInCloudinary,
+  fileUploadInCloudinary,
+} from "../utils/clodinary.js";
 
 const AgentController = {
-    addAgent: async function (req, res) {
-        try {
-            const data = req.body;
+  addAgent: async function (req, res) {
+    try {
+      const data = req.body;
 
-            if ((data.name && data.email && data.mobileNo && data.password) === "") {
-                const response = {
-                    statusCode: 401,
-                    sucess: false,
-                    message: "Please Enter Valid Fiedls",
-                };
-                return res.status(200).json(response);
-            }
+      if (
+        (data.name && data.email && data.mobileNo && data.password) ===
+        undefined
+      ) {
+        const response = {
+          statusCode: 401,
+          sucess: false,
+          message: "Please Enter Valid Fiedls",
+        };
+        return res.status(200).json(response);
+      }
 
-            const findAgent = await AgentModel.findOne({ email: data.email });
+      const findAgent = await AgentModel.findOne({ email: data.email });
 
+      if (findAgent) {
+        const response = {
+          statusCode: 401,
+          success: false,
+          message: "Agent Already Exits",
+        };
+        return res.status(200).json(response);
+      }
 
-            if (findAgent) {
-                const response = {
-                    statusCode: 401,
-                    success: false,
-                    message: "Agent Already Exits",
-                };
-                return res.status(200).json(response);
-            }
+      const nameFirstLetter = data.name.toLowerCase().slice(0, 1);
+      const url = publicUrl(nameFirstLetter);
 
-            const nameFirstLetter = data.name.toLowerCase().slice(0, 1);
-            const url = publicUrl(nameFirstLetter);
+      const aadharCardImage = [];
+      for (let i = 0; i < req.files["aadharCardPic"].length; i++) {
+        let result = await fileUploadInCloudinary(
+          req.files["aadharCardPic"][i].path
+        );
+        aadharCardImage.push(result.secure_url);
+      }
 
+      const panCardImage = [];
+      for (let i = 0; i < req.files["panCardPic"].length; i++) {
+        let result = await fileUploadInCloudinary(
+          req.files["panCardPic"][i].path
+        );
+        panCardImage.push(result.secure_url);
+      }
 
+      data.aadharCardPic = aadharCardImage;
+      data.panCardPic = panCardImage;
 
-            const aadharCardImage = [];
-            for (let i = 0; i < req.files['aadharCardPic'].length; i++) {
-                let result = await fileUploadInCloudinary(req.files['aadharCardPic'][i].path);
-                aadharCardImage.push(result.secure_url);
-            }
+      const agent = new AgentModel({ ...data, profilePic: url });
+      await agent.save();
 
-            const panCardImage = [];
-            for (let i = 0; i < req.files['panCardPic'].length; i++) {
-                let result = await fileUploadInCloudinary(req.files['panCardPic'][i].path);
-                panCardImage.push(result.secure_url);
-            }
+      const token = generateToken({ id: agent._id });
 
-            data.aadharCardPic = aadharCardImage;
-            data.panCardPic = panCardImage;
-
-            const agent = new AgentModel({ ...data, profilePic: url, });
-            await agent.save();
-
-            const token = generateToken({ id: agent._id });
-
-            const emailTemp = `
+      const emailTemp = `
           <table cellpadding="0" cellspacing="0" width="100%" bgcolor="#f0f0f0">
     <tr>
     <td align="center">
@@ -88,89 +95,89 @@ const AgentController = {
     
     `;
 
-            transporter.sendMail(
-                {
-                    to: agent.email,
-                    subject: "Home-Hub Market",
-                    html: emailTemp,
-                },
-                (err, info) => {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        console.log("Email Sent : " + info.response);
-                    }
-                }
-            );
-
-            const response = {
-                statusCode: 201,
-                success: true,
-                Agent: agent,
-                token: token,
-                message: "Agent registered Successfully",
-            };
-            return res.status(200).json(response);
-        } catch (error) {
-            const response = {
-                statusCode: 501,
-                sucess: false,
-                message: error.message,
-            };
-            return res.status(200).json(response);
+      transporter.sendMail(
+        {
+          to: agent.email,
+          subject: "Home-Hub Market",
+          html: emailTemp,
+        },
+        (err, info) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log("Email Sent : " + info.response);
+          }
         }
-    },
-    getAllAgent: async function (req, res) {
-        try {
-            const user = await UserModel.findById(req.user?._id);
-            if (!user) {
-                const response = {
-                    statusCode: 401,
-                    success: false,
-                    message: "Unauthorized User",
-                };
-                return res.status(200).json(response);
-            }
+      );
 
-            if (user.role === 'USER') {
-                const response = {
-                    statusCode: 400,
-                    success: false,
-                    message: "User Not Show Data",
-                };
-                return res.status(200).json(response);
-            }
+      const response = {
+        statusCode: 201,
+        success: true,
+        Agent: agent,
+        token: token,
+        message: "Agent registered Successfully",
+      };
+      return res.status(200).json(response);
+    } catch (error) {
+      const response = {
+        statusCode: 501,
+        sucess: false,
+        message: error.message,
+      };
+      return res.status(200).json(response);
+    }
+  },
+  getAllAgent: async function (req, res) {
+    try {
+      const user = await UserModel.findById(req.user?._id);
+      if (!user) {
+        const response = {
+          statusCode: 401,
+          success: false,
+          message: "Unauthorized User",
+        };
+        return res.status(200).json(response);
+      }
 
-            const allAgent = await AgentModel.find();
-            if (!allAgent) {
-                const response = {
-                    statusCode: 400,
-                    sucess: false,
-                    message: "Bad Request",
-                };
-                return res.status(200).json(response);
-            }
-            const response = {
-                statusCode: 200,
-                sucess: true,
-                allAgent,
-                message: "All Agent",
-            };
-            return res.status(200).json(response);
-        } catch (error) {
-            const response = {
-                statusCode: 501,
-                sucess: false,
-                message: error.message,
-            };
-            return res.status(200).json(response);
-        }
-    },
-    agentMetting: async function (req, res) {
-        try {
-            const {email,date,time,name,link} = req.body;
+      if (user.role === "USER") {
+        const response = {
+          statusCode: 400,
+          success: false,
+          message: "User Not Show Data",
+        };
+        return res.status(200).json(response);
+      }
 
-            const mailFormat = `
+      const allAgent = await AgentModel.find();
+      if (!allAgent) {
+        const response = {
+          statusCode: 400,
+          sucess: false,
+          message: "Bad Request",
+        };
+        return res.status(200).json(response);
+      }
+      const response = {
+        statusCode: 200,
+        sucess: true,
+        allAgent,
+        message: "All Agent",
+      };
+      return res.status(200).json(response);
+    } catch (error) {
+      const response = {
+        statusCode: 501,
+        sucess: false,
+        message: error.message,
+      };
+      return res.status(200).json(response);
+    }
+  },
+  agentMetting: async function (req, res) {
+    try {
+      const { email, date, time, name, link } = req.body;
+
+      const mailFormat = `
             <table cellpadding="0" cellspacing="0" width="100%" bgcolor="#f0f0f0">
                 <tr>
                     <td align="center">
@@ -200,42 +207,42 @@ const AgentController = {
                 </tr>
                 </table>
             `;
-            
-            transporter.sendMail(
-                {
-                  to: email,
-                  subject: "Home-Hub Market",
-                  html: mailFormat,
-                },
-                (err, info) => {
-                  if (err) {
-                    console.log(err);
-                  } else {
-                    console.log("Email Sent : " + info.response);
-                  }
-                }
-              );
 
-              const response = {
-                statusCode: 201,
-                success: true,
-                message: "Email Send Successfully",
-              };
-              return res.status(200).json(response);
-        } catch (error) {
-            const response = {
-                statusCode: 501,
-                sucess: false,
-                message: error.message,
-            };
-            return res.status(200).json(response);
+      transporter.sendMail(
+        {
+          to: email,
+          subject: "Home-Hub Market",
+          html: mailFormat,
+        },
+        (err, info) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log("Email Sent : " + info.response);
+          }
         }
-    },
-    verifyEmail: async function (req, res) {
-        try {
-          const { email } = req.body;
-            
-          const mailFormat = `
+      );
+
+      const response = {
+        statusCode: 201,
+        success: true,
+        message: "Email Send Successfully",
+      };
+      return res.status(200).json(response);
+    } catch (error) {
+      const response = {
+        statusCode: 501,
+        sucess: false,
+        message: error.message,
+      };
+      return res.status(200).json(response);
+    }
+  },
+  verifyEmail: async function (req, res) {
+    try {
+      const { email } = req.body;
+
+      const mailFormat = `
                     <table cellpadding="0" cellspacing="0" width="100%" bgcolor="#f0f0f0">
                     <tr>
                         <td align="center">
@@ -258,38 +265,37 @@ const AgentController = {
                     </tr>
                     </table>
                     `;
-          
-          transporter.sendMail(
-            {
-                to: email,
-                subject: "Home-Hub Market",
-                html: mailFormat,
-            },
-            (err, info) => {
-                if (err) {
-                    console.log(err);
-                } else {
-                    console.log("Email Sent : " + info.response);
-                }
-            }
-        );
 
-          
-          const response = {
-            statusCode: 201,
-            success: true,
-            message: "Email Send Successfully.",
-          };
-          return res.status(200).json(response);
-        } catch (error) {
-          const response = {
-            statusCode: 501,
-            sucess: false,
-            message: error.message,
-          };
-          return res.status(200).json(response);
+      transporter.sendMail(
+        {
+          to: email,
+          subject: "Home-Hub Market",
+          html: mailFormat,
+        },
+        (err, info) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log("Email Sent : " + info.response);
+          }
         }
-      },
-}
+      );
+
+      const response = {
+        statusCode: 201,
+        success: true,
+        message: "Email Send Successfully.",
+      };
+      return res.status(200).json(response);
+    } catch (error) {
+      const response = {
+        statusCode: 501,
+        sucess: false,
+        message: error.message,
+      };
+      return res.status(200).json(response);
+    }
+  },
+};
 
 export { AgentController };
