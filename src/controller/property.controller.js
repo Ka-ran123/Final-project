@@ -132,33 +132,6 @@ const PropertyController = {
       return res.status(200).json(response);
     }
   },
-  getAllPropertyForApp: async (req, res) => {
-    try {
-      const allProperty = await PropertyModel.find();
-      if (!allProperty) {
-        const response = {
-          statusCode: 400,
-          sucess: false,
-          message: "Bad Request",
-        };
-        return res.status(200).json(response);
-      }
-      const response = {
-        statusCode: 200,
-        sucess: true,
-        allProperty,
-        message: "All Property Show",
-      };
-      return res.status(200).json(response);
-    } catch (error) {
-      const response = {
-        statusCode: 501,
-        sucess: false,
-        message: error.message,
-      };
-      return res.status(200).json(response);
-    }
-  },
   getUserAllProperty: async (req, res) => {
     try {
       const user = await UserModel.findById(req.user?._id);
@@ -285,6 +258,87 @@ const PropertyController = {
       return res.status(200).json(response);
     }
   },
+  getAllPropertyForApp: async (req, res) => {
+    try {
+      const allProperty = await PropertyModel.find();
+      if (!allProperty) {
+        const response = {
+          statusCode: 400,
+          sucess: false,
+          message: "Bad Request",
+        };
+        return res.status(200).json(response);
+      }
+      const response = {
+        statusCode: 200,
+        sucess: true,
+        allProperty,
+        message: "All Property Show",
+      };
+      return res.status(200).json(response);
+    } catch (error) {
+      const response = {
+        statusCode: 501,
+        sucess: false,
+        message: error.message,
+      };
+      return res.status(200).json(response);
+    }
+  },
+  getOnlySellProperty:async (req,res)=>{
+    try {
+      const allProperty = await PropertyModel.find({type:{$eq:'Sell'}});
+      if (!allProperty) {
+        const response = {
+          statusCode: 400,
+          sucess: false,
+          message: "Bad Request",
+        };
+        return res.status(200).json(response);
+      }
+      const response = {
+        statusCode: 200,
+        sucess: true,
+        allProperty,
+        message: "All Sell Property Show",
+      };
+      return res.status(200).json(response);
+    } catch (error) {
+      const response = {
+        statusCode: 501,
+        sucess: false,
+        message: error.message,
+      };
+      return res.status(200).json(response);
+    }
+  },
+  getOnlyBuyProperty:async (req,res)=>{
+    try {
+      const allProperty = await PropertyModel.find({type:{$eq:'Buy'}});
+      if (!allProperty) {
+        const response = {
+          statusCode: 400,
+          sucess: false,
+          message: "Bad Request",
+        };
+        return res.status(200).json(response);
+      }
+      const response = {
+        statusCode: 200,
+        sucess: true,
+        allProperty,
+        message: "All Buy Property Show",
+      };
+      return res.status(200).json(response);
+    } catch (error) {
+      const response = {
+        statusCode: 501,
+        sucess: false,
+        message: error.message,
+      };
+      return res.status(200).json(response);
+    }
+  }
 };
 
 export { PropertyController };

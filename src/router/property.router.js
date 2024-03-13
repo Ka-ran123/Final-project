@@ -13,6 +13,8 @@ router.get('/getuserpending-property' , verifyUser, PropertyController.getUserPe
 router.get('/getuserapproval-property' , verifyUser, PropertyController.getUserApprovalProperty)
 router.get('/getusercancel-property' , verifyUser, PropertyController.getUserCancelProperty)
 router.get('/getall-property-app', PropertyController.getAllPropertyForApp)
+router.get('/getall-sellproperty-app', PropertyController.getOnlySellProperty)
+router.get('/getall-buyproperty-app', PropertyController.getOnlyBuyProperty)
 
 
 export const propertyRouter = router
