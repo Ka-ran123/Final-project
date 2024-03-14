@@ -113,7 +113,7 @@ const propertySchema = new Schema(
     status: {
       type: String,
       enum: {
-        values: ["approval", "cancle", "pending"],
+        values: ["approval", "cancel", "pending"],
         message: "Plz ! Select One..!",
       },
       default: "pending",
