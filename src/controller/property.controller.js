@@ -54,11 +54,14 @@ const PropertyController = {
       let agentId;
       if (!findAgent) {
         const findAgent = await AgentModel.find().sort({ date: -1 });
-        agentId = findAgent[0]._id;
+        let num = Math.floor(Math.random()*10/2) + 1;
+        console.log(num);
+        agentId = findAgent[num]._id;
       } else {
         agentId = findAgent._id;
       }
 
+      console.log(agentId);
       data.propertyImage = image;
       data.facility = data.facility.split(",");
 
@@ -68,7 +71,7 @@ const PropertyController = {
         agentId,
       });
 
-      await propertyData.save();
+      // await propertyData.save();
 
       const response = {
         statusCode: 201,
@@ -239,7 +242,7 @@ const PropertyController = {
       }
 
       const propertyData = await PropertyModel.find({
-        $and: [{ userId: user._id }, { status: "cancle" }],
+        $and: [{ userId: user._id }, { status: "cancel" }],
       });
 
       const response = {
@@ -287,7 +290,7 @@ const PropertyController = {
   },
   getOnlySellProperty:async (req,res)=>{
     try {
-      const allProperty = await PropertyModel.find({type:{$eq:'Sell'}});
+      const allProperty = await PropertyModel.find({$and:[{type:{$eq:"Sell"},status:{$eq:"approval"}}]});
       if (!allProperty) {
         const response = {
           statusCode: 400,
@@ -314,7 +317,7 @@ const PropertyController = {
   },
   getOnlyRentProperty:async (req,res)=>{
     try {
-      const allProperty = await PropertyModel.find({type:{$eq:'Rent'}});
+      const allProperty = await PropertyModel.find({$and:[{type:{$eq:"Rent"},status:{$eq:"approval"}}]});
       if (!allProperty) {
         const response = {
           statusCode: 400,
@@ -330,6 +333,112 @@ const PropertyController = {
         message: "All Rent Property Show",
       };
       return res.status(200).json(response);
+    } catch (error) {
+      const response = {
+        statusCode: 501,
+        sucess: false,
+        message: error.message,
+      };
+      return res.status(200).json(response);
+    }
+  },
+  setApproveProperty:async (req,res)=>{
+    try {
+      const admin = await UserModel.findById(req.user?._id);
+      if (!admin) {
+        const response = {
+          statusCode: 401,
+          success: false,
+          message: "Unauthorized User",
+        };
+        return res.status(200).json(response);
+      }
+
+      if (admin.role === "USER") {
+        const response = {
+          statusCode: 400,
+          success: false,
+          message: "User Can Not Change.",
+        };
+        return res.status(200).json(response);
+      }
+
+      const data = req.body.id;
+      
+      const property = await PropertyModel.findById(data);
+      if(!property)
+      {
+        const response = {
+          statusCode: 404,
+          sucess: false,
+          message: "Property Does Not Found",
+        };
+        return res.status(200).json(response);
+      }
+
+      property.status = "approval";
+      await property.save();
+      const response = {
+        statusCode: 200,
+        sucess: true,
+        property,
+        message: "Property status Change successfully",
+      };
+      return res.status(200).json(response);
+      
+    } catch (error) {
+      const response = {
+        statusCode: 501,
+        sucess: false,
+        message: error.message,
+      };
+      return res.status(200).json(response);
+    }
+  },
+  setCancelProperty:async (req,res)=>{
+    try {
+      const admin = await UserModel.findById(req.user?._id);
+      if (!admin) {
+        const response = {
+          statusCode: 401,
+          success: false,
+          message: "Unauthorized User",
+        };
+        return res.status(200).json(response);
+      }
+
+      if (admin.role === "USER") {
+        const response = {
+          statusCode: 400,
+          success: false,
+          message: "User Can Not Change.",
+        };
+        return res.status(200).json(response);
+      }
+
+      const data = req.body.id;
+      
+      const property = await PropertyModel.findById(data);
+      if(!property)
+      {
+        const response = {
+          statusCode: 404,
+          sucess: false,
+          message: "Property Does Not Found",
+        };
+        return res.status(200).json(response);
+      }
+
+      property.status = "cancel";
+      await property.save();
+      const response = {
+        statusCode: 200,
+        sucess: true,
+        property,
+        message: "Property status Change successfully",
+      };
+      return res.status(200).json(response);
+      
     } catch (error) {
       const response = {
         statusCode: 501,

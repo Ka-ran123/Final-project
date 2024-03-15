@@ -12,9 +12,11 @@ router.get('/getuserall-property' , verifyUser, PropertyController.getUserAllPro
 router.get('/getuserpending-property' , verifyUser, PropertyController.getUserPendingProperty)
 router.get('/getuserapproval-property' , verifyUser, PropertyController.getUserApprovalProperty)
 router.get('/getusercancel-property' , verifyUser, PropertyController.getUserCancelProperty)
-router.get('/getall-property-app', PropertyController.getAllPropertyForApp)
-router.get('/getall-sellproperty-app', PropertyController.getOnlySellProperty)
-router.get('/getall-rentproperty-app', PropertyController.getOnlyRentProperty)
+router.get('/getall-property', PropertyController.getAllPropertyForApp)
+router.get('/getall-sellproperty', PropertyController.getOnlySellProperty)
+router.get('/getall-rentproperty', PropertyController.getOnlyRentProperty)
+router.post('/set-approveproperty',verifyUser, PropertyController.setApproveProperty)
+router.post('/set-cancelproperty',verifyUser, PropertyController.setCancelProperty)
 
 
 export const propertyRouter = router
