@@ -254,7 +254,7 @@ const AgentController = {
                                             <h1>**Verification**</h1>
                                             <p>Hello there!</p>
                                             <p>If you want to become an agent, click on the link below and fill up the form..</p>
-                                            <a href="${`https://meet.google.com/ckw-gwbq-vqr`}">💥Click this link to fill form💥</a>
+                                            <a href="${`https://homehubmarket-b65c6.web.app/agent/`}">💥Click this link to fill form💥</a>
                                             <p>Best regards</p>
                                             <p>Home-Hub Market</p>
                                         </div>
