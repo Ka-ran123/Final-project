@@ -54,21 +54,11 @@ const propertySchema = new Schema(
       required: true,
       trim: true,
     },
-    floorNo: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    rooms: {
-      type: String,
-      required: true,
-      trim: true,
-    },
     propertyType: {
       type: String,
       enum: {
         values: [
-          "Appartement",
+          "Appartment",
           "Independent House",
           "Villa",
           "Affordable House",
@@ -90,7 +80,7 @@ const propertySchema = new Schema(
     houseType: {
       type: String,
       enum: {
-        values: ["1Rk", "1BHK", "2BHK", "3+BHK"],
+        values: ["1 BHK", "2 BHK", "3 BHK","3+ BHK"],
         message: "Plz ! Select One..!",
       },
       required: true,
@@ -136,11 +126,6 @@ const propertySchema = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "agent",
       default: null,
-    },
-    isRent: {
-      type: Boolean,
-      default: false,
-      trim: true,
     },
   },
   { timestamps: true }

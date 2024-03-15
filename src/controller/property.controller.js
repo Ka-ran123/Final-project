@@ -54,7 +54,7 @@ const PropertyController = {
       let agentId;
       if (!findAgent) {
         const findAgent = await AgentModel.find().sort({ date: -1 });
-        let num = Math.floor(Math.random()*10/2) + 1;
+        let num = Math.floor((Math.random() * 10) / 2) + 1;
         console.log(num);
         agentId = findAgent[num]._id;
       } else {
@@ -71,7 +71,7 @@ const PropertyController = {
         agentId,
       });
 
-      // await propertyData.save();
+      await propertyData.save();
 
       const response = {
         statusCode: 201,
@@ -288,9 +288,11 @@ const PropertyController = {
       return res.status(200).json(response);
     }
   },
-  getOnlySellProperty:async (req,res)=>{
+  getOnlySellProperty: async (req, res) => {
     try {
-      const allProperty = await PropertyModel.find({$and:[{type:{$eq:"Sell"},status:{$eq:"approval"}}]});
+      const allProperty = await PropertyModel.find({
+        $and: [{ type: { $eq: "Sell" }, status: { $eq: "approval" } }],
+      });
       if (!allProperty) {
         const response = {
           statusCode: 400,
@@ -315,9 +317,11 @@ const PropertyController = {
       return res.status(200).json(response);
     }
   },
-  getOnlyRentProperty:async (req,res)=>{
+  getOnlyRentProperty: async (req, res) => {
     try {
-      const allProperty = await PropertyModel.find({$and:[{type:{$eq:"Rent"},status:{$eq:"approval"}}]});
+      const allProperty = await PropertyModel.find({
+        $and: [{ type: { $eq: "Rent" }, status: { $eq: "approval" } }],
+      });
       if (!allProperty) {
         const response = {
           statusCode: 400,
@@ -342,7 +346,7 @@ const PropertyController = {
       return res.status(200).json(response);
     }
   },
-  setApproveProperty:async (req,res)=>{
+  setApproveProperty: async (req, res) => {
     try {
       const admin = await UserModel.findById(req.user?._id);
       if (!admin) {
@@ -364,10 +368,9 @@ const PropertyController = {
       }
 
       const data = req.body.id;
-      
+
       const property = await PropertyModel.findById(data);
-      if(!property)
-      {
+      if (!property) {
         const response = {
           statusCode: 404,
           sucess: false,
@@ -385,7 +388,6 @@ const PropertyController = {
         message: "Property status Change successfully",
       };
       return res.status(200).json(response);
-      
     } catch (error) {
       const response = {
         statusCode: 501,
@@ -395,7 +397,7 @@ const PropertyController = {
       return res.status(200).json(response);
     }
   },
-  setCancelProperty:async (req,res)=>{
+  setCancelProperty: async (req, res) => {
     try {
       const admin = await UserModel.findById(req.user?._id);
       if (!admin) {
@@ -417,10 +419,9 @@ const PropertyController = {
       }
 
       const data = req.body.id;
-      
+
       const property = await PropertyModel.findById(data);
-      if(!property)
-      {
+      if (!property) {
         const response = {
           statusCode: 404,
           sucess: false,
@@ -438,7 +439,6 @@ const PropertyController = {
         message: "Property status Change successfully",
       };
       return res.status(200).json(response);
-      
     } catch (error) {
       const response = {
         statusCode: 501,
@@ -447,7 +447,7 @@ const PropertyController = {
       };
       return res.status(200).json(response);
     }
-  }
+  },
 };
 
 export { PropertyController };
