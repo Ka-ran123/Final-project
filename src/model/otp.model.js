@@ -6,6 +6,7 @@ const otpSchema=new Schema({
         type: String,
         required: true,
         lowercase: true,
+        trim: true,
         validate(value) {
           if (!validator.isEmail(value)) {
             throw new Error("Validation Error");
@@ -13,7 +14,8 @@ const otpSchema=new Schema({
         },
       },
       otp:{
-        type:String
+        type:String,
+        trim: true
       }
 })
 

@@ -7,12 +7,14 @@ const agentSchema = new Schema(
         name: {
             type: String,
             required: true,
+            trim:true,
         },
         email: {
             type: String,
             required: true,
             lowercase: true,
             unique: true,
+            trim: true,
             validate(value) {
                 if (!validator.isEmail(value)) {
                     throw new Error("Validation Error");
@@ -22,25 +24,31 @@ const agentSchema = new Schema(
         mobileNo: {
             type: String,
             required: true,
+            trim: true,
         },
         password: {
             type: String,
             required: true,
+            trim: true,
         },
         profilePic: {
             type: String,
+            trim: true,
             default: null,
         },
         publicUrl: {
             type: String,
             default: null,
+            trim: true,
         },
         role: {
             type: String,
+            trim: true,
             default: "AGENT",
         },
         age: {
             type: String,
+            trim: true,
             required: true
         },
         gender: {
@@ -49,43 +57,53 @@ const agentSchema = new Schema(
                 values: ["Male", "Female"],
                 message: "Gender is not correct",
             },
-            required: true
+            required: true,
+            trim: true
         },
         city: {
             type: String,
-            required: true
+            required: true,
+            trim: true
         },
         state: {
             type: String,
-            required: true
+            required: true,
+            trim: true
         },
         address: {
             type: String,
-            required: true
+            required: true,
+            trim: true
         },
         bankName: {
             type: String,
-            required: true
+            required: true,
+            trim: true
         },
         bankAccountNo: {
             type: String,
-            required: true
+            required: true,
+            trim: true
         },
         ifscCode: {
             type: String,
-            required: true
+            required: true,
+            trim: true
         },
         aadharCardPic: {
             type: [String],
-            required: true
+            required: true,
+            trim: true
         },
         panCardPic: {
             type: [String],
             required: true,
+            trim: true
         },
         date: {
             type: Date,
-            default: Date.now()
+            default: Date.now(),
+            trim: true
         }
     },
     { timestamps: true }

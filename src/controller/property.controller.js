@@ -1,453 +1,277 @@
 import { PropertyModel } from "../model/property.model.js";
 import { UserModel } from "../model/user.model.js";
 import { AgentModel } from "../model/agent.model.js";
-import {
-  fileDestroyInCloudinary,
-  fileUploadInCloudinary,
-} from "../utils/clodinary.js";
+import { fileUploadInCloudinary } from "../utils/clodinary.js";
+import { Message } from "../config/message.js";
 
-const PropertyController = {
-  addProperty: async (req, res) => {
-    try {
-      const user = await UserModel.findById(req.user?._id);
-      // console.log(user);
-      if (!user) {
-        const response = {
-          statusCode: 401,
-          success: false,
-          message: "Unauthorized User",
-        };
-        return res.status(200).json(response);
-      }
+const { propertyMessage, errorMessage } = Message;
 
-      const data = req.body;
-      // console.log(data);
+export const addProperty = async (req, res) => {
+  try {
+    const user = req.user;
 
-      if (user.email !== data.email && user.mobileNo !== data.mobileNo) {
-        const response = {
-          statusCode: 400,
-          success: false,
-          message: "Invalid Data",
-        };
-        return res.status(200).json(response);
-      }
+    const data = req.body;
 
-      if (req.files === undefined) {
-        const response = {
-          statusCode: 400,
-          success: false,
-          message: "Invalid Data",
-        };
-        return res.status(200).json(response);
-      }
-
-      const image = [];
-      for (let i = 0; i < req.files.length; i++) {
-        let result = await fileUploadInCloudinary(req.files[i].path);
-        image.push(result.secure_url);
-      }
-
-      const userCity = data.city;
-
-      const findAgent = await AgentModel.findOne({ city: userCity });
-
-      let agentId;
-      if (!findAgent) {
-        const findAgent = await AgentModel.find().sort({ date: -1 });
-        let num = Math.floor((Math.random() * 10) / 2) + 1;
-        console.log(num);
-        agentId = findAgent[num]._id;
-      } else {
-        agentId = findAgent._id;
-      }
-
-      console.log(agentId);
-      data.propertyImage = image;
-      data.facility = data.facility.split(",");
-
-      const propertyData = new PropertyModel({
-        ...data,
-        userId: user._id,
-        agentId,
-      });
-
-      await propertyData.save();
-
-      const response = {
-        statusCode: 201,
-        success: true,
-        propertyData,
-        message: "Property Add Successfully",
-      };
-      return res.status(200).json(response);
-    } catch (error) {
-      const response = {
-        statusCode: 501,
-        sucess: false,
-        message: error.message,
-      };
-      return res.status(200).json(response);
+    if (user.email !== data.email && user.mobileNo !== data.mobileNo) {
+      return res
+        .status(404)
+        .json({ success: false, message: errorMessage.InvalidData });
     }
-  },
-  getAllProperty: async (req, res) => {
-    try {
-      const user = await UserModel.findById(req.user?._id);
-      if (!user) {
-        const response = {
-          statusCode: 401,
-          success: false,
-          message: "Unauthorized User",
-        };
-        return res.status(200).json(response);
-      }
 
-      if (user.role === "USER") {
-        const response = {
-          statusCode: 400,
-          success: false,
-          message: "User Not Show Data",
-        };
-        return res.status(200).json(response);
-      }
-
-      const allProperty = await PropertyModel.find();
-      if (!allProperty) {
-        const response = {
-          statusCode: 400,
-          sucess: false,
-          message: "Bad Request",
-        };
-        return res.status(200).json(response);
-      }
-      const response = {
-        statusCode: 200,
-        sucess: true,
-        allProperty,
-        message: "All Property Show",
-      };
-      return res.status(200).json(response);
-    } catch (error) {
-      const response = {
-        statusCode: 501,
-        sucess: false,
-        message: error.message,
-      };
-      return res.status(200).json(response);
+    if (req.files === undefined) {
+      return res
+        .status(404)
+        .json({ success: false, message: errorMessage.InvalidData });
     }
-  },
-  getUserAllProperty: async (req, res) => {
-    try {
-      const user = await UserModel.findById(req.user?._id);
-      if (!user) {
-        const response = {
-          statusCode: 401,
-          success: false,
-          message: "Unauthorized User",
-        };
-        return res.status(200).json(response);
-      }
 
-      const propertyData = await PropertyModel.find({ userId: user._id });
-
-      const response = {
-        statusCode: 200,
-        success: true,
-        propertyData,
-        message: "All Property",
-      };
-      return res.status(200).json(response);
-    } catch (error) {
-      const response = {
-        statusCode: 501,
-        sucess: false,
-        message: error.message,
-      };
-      return res.status(200).json(response);
+    const image = [];
+    for (let i = 0; i < req.files.length; i++) {
+      let result = await fileUploadInCloudinary(req.files[i].path);
+      image.push(result.secure_url);
     }
-  },
-  getUserPendingProperty: async (req, res) => {
-    try {
-      const user = await UserModel.findById(req.user?._id);
-      if (!user) {
-        const response = {
-          statusCode: 401,
-          success: false,
-          message: "Unauthorized User",
-        };
-        return res.status(200).json(response);
-      }
 
-      const propertyData = await PropertyModel.find({
-        $and: [{ userId: user._id }, { status: "pending" }],
-      });
+    const userCity = data.city;
 
-      const response = {
-        statusCode: 200,
-        success: true,
-        propertyData,
-        message: "All Property",
-      };
-      return res.status(200).json(response);
-    } catch (error) {
-      const response = {
-        statusCode: 501,
-        sucess: false,
-        message: error.message,
-      };
-      return res.status(200).json(response);
+    const findAgent = await AgentModel.findOne({ city: userCity });
+
+    let agentId;
+    if (!findAgent) {
+      const findAgent = await AgentModel.find().sort({ date: -1 });
+      let num = Math.floor((Math.random() * 10) / 2) + 1;
+      // console.log(num);
+      agentId = findAgent[num]._id;
+    } else {
+      agentId = findAgent._id;
     }
-  },
-  getUserApprovalProperty: async (req, res) => {
-    try {
-      const user = await UserModel.findById(req.user?._id);
-      if (!user) {
-        const response = {
-          statusCode: 401,
-          success: false,
-          message: "Unauthorized User",
-        };
-        return res.status(200).json(response);
-      }
 
-      const propertyData = await PropertyModel.find({
-        $and: [{ userId: user._id }, { status: "approval" }],
-      });
+    // console.log(agentId);
+    data.propertyImage = image;
+    data.facility = data.facility.split(",");
 
-      const response = {
-        statusCode: 200,
-        success: true,
-        propertyData,
-        message: "All Property",
-      };
-      return res.status(200).json(response);
-    } catch (error) {
-      const response = {
-        statusCode: 501,
-        sucess: false,
-        message: error.message,
-      };
-      return res.status(200).json(response);
-    }
-  },
-  getUserCancelProperty: async (req, res) => {
-    try {
-      const user = await UserModel.findById(req.user?._id);
-      if (!user) {
-        const response = {
-          statusCode: 401,
-          success: false,
-          message: "Unauthorized User",
-        };
-        return res.status(200).json(response);
-      }
+    const propertyData = new PropertyModel({
+      ...data,
+      userId: user._id,
+      agentId,
+    });
 
-      const propertyData = await PropertyModel.find({
-        $and: [{ userId: user._id }, { status: "cancel" }],
-      });
+    await propertyData.save();
 
-      const response = {
-        statusCode: 200,
-        success: true,
-        propertyData,
-        message: "All Property",
-      };
-      return res.status(200).json(response);
-    } catch (error) {
-      const response = {
-        statusCode: 501,
-        sucess: false,
-        message: error.message,
-      };
-      return res.status(200).json(response);
-    }
-  },
-  getAllPropertyForApp: async (req, res) => {
-    try {
-      const allProperty = await PropertyModel.find();
-      if (!allProperty) {
-        const response = {
-          statusCode: 400,
-          sucess: false,
-          message: "Bad Request",
-        };
-        return res.status(200).json(response);
-      }
-      const response = {
-        statusCode: 200,
-        sucess: true,
-        allProperty,
-        message: "All Property Show",
-      };
-      return res.status(200).json(response);
-    } catch (error) {
-      const response = {
-        statusCode: 501,
-        sucess: false,
-        message: error.message,
-      };
-      return res.status(200).json(response);
-    }
-  },
-  getOnlySellProperty: async (req, res) => {
-    try {
-      const allProperty = await PropertyModel.find({
-        $and: [{ type: { $eq: "Sell" }, status: { $eq: "approval" } }],
-      });
-      if (!allProperty) {
-        const response = {
-          statusCode: 400,
-          sucess: false,
-          message: "Bad Request",
-        };
-        return res.status(200).json(response);
-      }
-      const response = {
-        statusCode: 200,
-        sucess: true,
-        allProperty,
-        message: "All Sell Property Show",
-      };
-      return res.status(200).json(response);
-    } catch (error) {
-      const response = {
-        statusCode: 501,
-        sucess: false,
-        message: error.message,
-      };
-      return res.status(200).json(response);
-    }
-  },
-  getOnlyRentProperty: async (req, res) => {
-    try {
-      const allProperty = await PropertyModel.find({
-        $and: [{ type: { $eq: "Rent" }, status: { $eq: "approval" } }],
-      });
-      if (!allProperty) {
-        const response = {
-          statusCode: 400,
-          sucess: false,
-          message: "Bad Request",
-        };
-        return res.status(200).json(response);
-      }
-      const response = {
-        statusCode: 200,
-        sucess: true,
-        allProperty,
-        message: "All Rent Property Show",
-      };
-      return res.status(200).json(response);
-    } catch (error) {
-      const response = {
-        statusCode: 501,
-        sucess: false,
-        message: error.message,
-      };
-      return res.status(200).json(response);
-    }
-  },
-  setApproveProperty: async (req, res) => {
-    try {
-      const admin = await UserModel.findById(req.user?._id);
-      if (!admin) {
-        const response = {
-          statusCode: 401,
-          success: false,
-          message: "Unauthorized User",
-        };
-        return res.status(200).json(response);
-      }
-
-      if (admin.role === "USER") {
-        const response = {
-          statusCode: 400,
-          success: false,
-          message: "User Can Not Change.",
-        };
-        return res.status(200).json(response);
-      }
-
-      const data = req.body.id;
-
-      const property = await PropertyModel.findById(data);
-      if (!property) {
-        const response = {
-          statusCode: 404,
-          sucess: false,
-          message: "Property Does Not Found",
-        };
-        return res.status(200).json(response);
-      }
-
-      property.status = "approval";
-      await property.save();
-      const response = {
-        statusCode: 200,
-        sucess: true,
-        property,
-        message: "Property status Change successfully",
-      };
-      return res.status(200).json(response);
-    } catch (error) {
-      const response = {
-        statusCode: 501,
-        sucess: false,
-        message: error.message,
-      };
-      return res.status(200).json(response);
-    }
-  },
-  setCancelProperty: async (req, res) => {
-    try {
-      const admin = await UserModel.findById(req.user?._id);
-      if (!admin) {
-        const response = {
-          statusCode: 401,
-          success: false,
-          message: "Unauthorized User",
-        };
-        return res.status(200).json(response);
-      }
-
-      if (admin.role === "USER") {
-        const response = {
-          statusCode: 400,
-          success: false,
-          message: "User Can Not Change.",
-        };
-        return res.status(200).json(response);
-      }
-
-      const data = req.body.id;
-
-      const property = await PropertyModel.findById(data);
-      if (!property) {
-        const response = {
-          statusCode: 404,
-          sucess: false,
-          message: "Property Does Not Found",
-        };
-        return res.status(200).json(response);
-      }
-
-      property.status = "cancel";
-      await property.save();
-      const response = {
-        statusCode: 200,
-        sucess: true,
-        property,
-        message: "Property status Change successfully",
-      };
-      return res.status(200).json(response);
-    } catch (error) {
-      const response = {
-        statusCode: 501,
-        sucess: false,
-        message: error.message,
-      };
-      return res.status(200).json(response);
-    }
-  },
+    return res.status(201).json({
+      success: true,
+      propertyData,
+      message: propertyMessage.AddProperty,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
 };
 
-export { PropertyController };
+export const getAllProperty = async (req, res) => {
+  try {
+    const user = req.user;
+
+    if (user.role === "USER") {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.InvalidData });
+    }
+    const allProperty = await PropertyModel.find();
+    if (!allProperty) {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.InvalidData });
+    }
+    return res.status(200).json({
+      success: true,
+      allProperty,
+      message: propertyMessage.GetAllProperty,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const getUserAllProperty = async (req, res) => {
+  try {
+    const user = req.user;
+
+    const propertyData = await PropertyModel.find({ userId: user._id });
+
+    return res.status(200).json({
+      success: true,
+      propertyData,
+      message: propertyMessage.GetUserAllProperty,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const getUserPendingProperty = async (req, res) => {
+  try {
+    const user = req.user;
+
+    const propertyData = await PropertyModel.find({
+      $and: [{ userId: user._id }, { status: "pending" }],
+    });
+
+    return res.status(200).json({
+      success: true,
+      propertyData,
+      message: propertyMessage.GetUserPendingProperty,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const getUserApprovalProperty = async (req, res) => {
+  try {
+    const user = req.user;
+
+    const propertyData = await PropertyModel.find({
+      $and: [{ userId: user._id }, { status: "approval" }],
+    });
+
+    return res.status(200).json({
+      success: true,
+      propertyData,
+      message: propertyMessage.GetUserApprovalProperty,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const getUserCancleProperty = async (req, res) => {
+  try {
+    const user = req.user;
+
+    const propertyData = await PropertyModel.find({
+      $and: [{ userId: user._id }, { status: "cancel" }],
+    });
+
+    return res.status(200).json({
+      success: true,
+      propertyData,
+      message: propertyMessage.GetUserCancelProperty,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const getAllPropertyForApp = async (_, res) => {
+  try {
+    const allProperty = await PropertyModel.find();
+    console.log(allProperty);
+    if (!allProperty) {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.InvalidData });
+    }
+    return res.status(200).json({
+      success: true,
+      allProperty,
+      message: propertyMessage.GetAllProperty,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const getOnlySellProperty = async (req, res) => {
+  try {
+    const allProperty = await PropertyModel.find({
+      $and: [{ type: { $eq: "Sell" }, status: { $eq: "approval" } }],
+    });
+
+    return res.status(200).json({
+      success: true,
+      allProperty,
+      message: propertyMessage.GetOnlySellProperty,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const getOnlyRentProperty = async (req, res) => {
+  try {
+    const allProperty = await PropertyModel.find({
+      $and: [{ type: { $eq: "Rent" }, status: { $eq: "approval" } }],
+    });
+
+    return res.status(200).json({
+      success: true,
+      allProperty,
+      message: propertyMessage.GetOnlyRentProperty,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const setApproveProperty = async (req, res) => {
+  try {
+    const admin = req.user;
+
+    if (admin.role === "USER") {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.UserCantChange });
+    }
+
+    const data = req.body.id;
+
+    const property = await PropertyModel.findById(data);
+    if (!property) {
+      return res
+        .status(404)
+        .json({ success: false, message: errorMessage.PropertyNotFound });
+    }
+
+    property.status = "approval";
+    await property.save();
+
+    return res.status(200).json({
+      success: true,
+      property,
+      message: propertyMessage.SetApproveProperty,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const setCancelProperty = async (req, res) => {
+  try {
+    const admin = req.user;
+
+    if (admin.role === "USER") {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.UserCantChange });
+    }
+
+    const data = req.body.id;
+
+    const property = await PropertyModel.findById(data);
+    if (!property) {
+      return res
+        .status(404)
+        .json({ success: false, message: errorMessage.PropertyNotFound });
+    }
+
+    property.status = "cancel";
+    await property.save();
+
+    return res.status(200).json({
+      success: true,
+      property,
+      message: propertyMessage.SetCancelProperty,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};

@@ -9,369 +9,281 @@ import {
   fileDestroyInCloudinary,
   fileUploadInCloudinary,
 } from "../utils/clodinary.js";
-const UserController = {
-  signUp: async function (req, res) {
-    try {
-      const data = req.body;
 
-      if (
-        (data.name && data.email && data.mobileNo && data.password) ===
-        undefined
-      ) {
-        const response = {
-          statusCode: 401,
-          sucess: false,
-          message: "Please Enter Valid Fiedls",
-        };
-        return res.status(200).json(response);
-      }
+import { Message } from "../config/message.js";
 
-      const findUser = await UserModel.findOne({ email: data.email });
+const { userMessage, errorMessage, emailMessage } = Message;
 
-      // if (data.role === "ADMIN") {
-      //   const response = {
-      //     statusCode: 401,
-      //     sucess: false,
-      //     message: "Select USER role",
-      //   };
-      //   return res.status(200).json(response);
-      // }
+export const signUp = async (req, res) => {
+  try {
+    const { name, email, mobileNo, password, role } = req.body;
 
-      if (findUser) {
-        const response = {
-          statusCode: 401,
-          success: false,
-          message: "User Already Exits",
-        };
-        return res.status(200).json(response);
-      }
+    if ((name && email && mobileNo && password) === undefined) {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.NotEnterValidFeilds });
+    }
 
-      const nameFirstLetter = data.name.toLowerCase().slice(0, 1);
-      const url = publicUrl(nameFirstLetter);
+    if (role === "ADMIN") {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.SelectValidRole });
+    }
 
-      const user = new UserModel({ ...data, profilePic: url });
-      await user.save();
+    const findUser = await UserModel.findOne({ email });
 
-      const token = generateToken({ id: user._id });
+    if (findUser) {
+      return res
+        .status(409)
+        .json({ success: false, message: errorMessage.UserAlreadyExits });
+    }
 
-      const emailTemp = `
-      <table cellpadding="0" cellspacing="0" width="100%" bgcolor="#f0f0f0">
+    const nameFirstLetter = name.toLowerCase().slice(0, 1);
+    const url = publicUrl(nameFirstLetter);
+
+    const user = new UserModel({
+      name,
+      email,
+      mobileNo,
+      password,
+      profilePic: url,
+    });
+    await user.save();
+
+    const token = generateToken({ id: user._id });
+
+    const emailTemp = `
+    <table cellpadding="0" cellspacing="0" width="100%" bgcolor="#f0f0f0">
 <tr>
 <td align="center">
-    <table width="600" cellpadding="0" cellspacing="0">
-        <tr>
-            <td>
-                <div style="padding: 20px; background-color: white; text-align: center;">
-                <img src="https://media.istockphoto.com/id/1472307744/photo/clipboard-and-pencil-on-blue-background-notepad-icon-clipboard-task-management-todo-check.webp?b=1&s=170667a&w=0&k=20&c=WfRoNKWq5Dr-23RuNifv1kbIR1LVuZAsCzzSH2I3HsY=" alt="Logo" width="200" height="100" style="display: block; margin: 0 auto;">
-                    <h1>Welcome to Our Service!</h1>
-                    <p>Dear ${user.name},</p>
-                    <p>Thank you for registering with Our app. You're now a part of our community.</p>
-                    <p>Your account details:</p>
-                    
-                    <strong>Username:</strong> ${user.name}<br>
-                    <strong>Email:</strong> ${user.email}
-                    
-                    <p>We're excited to have you on board, and you can start using our service right away.</p>
-                    <p>If you have any questions or need assistance, please don't hesitate to contact our support team at karanunagar123@gmail.com.</p>
-                    <p>Best regards,</p>
-                    <p>Home-Hub Market</p>
-                </div>
-            </td>
-        </tr>
-    </table>
+  <table width="600" cellpadding="0" cellspacing="0">
+      <tr>
+          <td>
+              <div style="padding: 20px; background-color: white; text-align: center;">
+              <img src="https://media.istockphoto.com/id/1472307744/photo/clipboard-and-pencil-on-blue-background-notepad-icon-clipboard-task-management-todo-check.webp?b=1&s=170667a&w=0&k=20&c=WfRoNKWq5Dr-23RuNifv1kbIR1LVuZAsCzzSH2I3HsY=" alt="Logo" width="200" height="100" style="display: block; margin: 0 auto;">
+                  <h1>Welcome to Our Service!</h1>
+                  <p>Dear ${user.name},</p>
+                  <p>Thank you for registering with Our app. You're now a part of our community.</p>
+                  <p>Your account details:</p>
+                  
+                  <strong>Username:</strong> ${user.name}<br>
+                  <strong>Email:</strong> ${user.email}
+                  
+                  <p>We're excited to have you on board, and you can start using our service right away.</p>
+                  <p>If you have any questions or need assistance, please don't hesitate to contact our support team at karanunagar123@gmail.com.</p>
+                  <p>Best regards,</p>
+                  <p>Home-Hub Market</p>
+              </div>
+          </td>
+      </tr>
+  </table>
 </td>
 </tr>
 </table>
 
 `;
 
-      transporter.sendMail(
-        {
-          to: user.email,
-          subject: "Home-Hub Market",
-          html: emailTemp,
-        },
-        (err, info) => {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log("Email Sent : " + info.response);
-          }
-        }
+    const mailOptions = {
+      to: user.email,
+      subject: emailMessage.SignupSubject,
+      html: emailTemp,
+    };
+
+    await sendEmail(mailOptions);
+
+    const userData = user.getData();
+    return res.status(201).json({
+      success: true,
+      User: userData,
+      token: token,
+      message: userMessage.SignUp,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const signIn = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if ((email && password) === undefined) {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.NotEnterValidFeilds });
+    }
+
+    const findUser = await UserModel.findOne({ email: email, role: "USER" });
+
+    const findAdmin = await UserModel.findOne({
+      email: email,
+      role: "ADMIN",
+    });
+
+    const findAgent = await AgentModel.findOne({
+      email: email,
+      role: "AGENT",
+    });
+
+    if (!findUser && !findAdmin && !findAgent) {
+      return res
+        .status(404)
+        .json({ success: false, message: errorMessage.UserNotExits });
+    }
+
+    let matchUserPasssword;
+    let matchAgentPasssword;
+    let matchAdminPasssword;
+    if (findUser) {
+      matchUserPasssword = await findUser.isPasswordCorrect(password);
+    } else if (findAgent) {
+      matchAgentPasssword = await findAgent.isPasswordCorrect(password);
+    } else {
+      matchAdminPasssword = await findAdmin.isPasswordCorrect(password);
+    }
+
+    if (!matchUserPasssword && !matchAdminPasssword && !matchAgentPasssword) {
+      return res
+        .status(401)
+        .json({ success: false, message: errorMessage.InvalidCredentials });
+    }
+
+  
+    if (findUser) {
+      const user = await UserModel.findById(findUser._id).select(
+        "-password -publicUrl"
       );
+      const userToken = generateToken({ id: findUser._id });
 
-      const userData = user.getData();
-      const response = {
-        statusCode: 201,
+      return res.status(200).json({
         success: true,
-        User: userData,
-        token: token,
-        message: "User registered Successfully",
-      };
-      return res.status(200).json(response);
-    } catch (error) {
-      const response = {
-        statusCode: 501,
-        sucess: false,
-        message: error.message,
-      };
-      return res.status(200).json(response);
-    }
-  },
-  signIn: async function (req, res) {
-    try {
-      const { email, password } = req.body;
-
-      if ((email && password) === undefined) {
-        const response = {
-          statusCode: 401,
-          sucess: false,
-          message: "Please Enter Valid Fiedls",
-        };
-        return res.status(200).json(response);
-      }
-
-      const findUser = await UserModel.findOne({ email: email, role: "USER" });
-
-      const findAdmin = await UserModel.findOne({
-        email: email,
-        role: "ADMIN",
+        user,
+        token: userToken,
+        message: userMessage.SignInUser,
       });
+    } else if (findAgent) {
+      const agent = await AgentModel.findById(findAgent._id).select(
+        "-password -publicUrl"
+      );
+      const agentToken = generateToken({ id: findAgent._id });
 
-      const findAgent = await AgentModel.findOne({
-        email: email,
-        role: "AGENT",
+      return res.status(200).json({
+        success: true,
+        agent,
+        token: agentToken,
+        message: userMessage.SignInAgent,
       });
+    } else {
+      const admin = await UserModel.findById(findAdmin._id).select(
+        "-password -publicUrl"
+      );
+      const adminToken = generateToken({ id: findAdmin._id });
 
-      if (!findUser && !findAdmin && !findAgent) {
-        const response = {
-          statusCode: 401,
-          sucess: false,
-          message: "User Not Exits",
-        };
-        return res.status(200).json(response);
-      }
-
-      let matchUserPasssword;
-      let matchAgentPasssword;
-      let matchAdminPasssword;
-      if (findUser) {
-        matchUserPasssword = await findUser.isPasswordCorrect(password);
-      } else if (findAgent) {
-        matchAgentPasssword = await findAgent.isPasswordCorrect(password);
-      } else {
-        matchAdminPasssword = await findAdmin.isPasswordCorrect(password);
-      }
-
-      if (!matchUserPasssword && !matchAdminPasssword && !matchAgentPasssword) {
-        const response = {
-          statusCode: 401,
-          sucess: false,
-          message: "Invalid User credentials",
-        };
-        return res.status(200).json(response);
-      }
-
-      const options = {
-        httpOnly: true,
-        secure: true,
-      };
-
-      if (findUser) {
-        const user = await UserModel.findById(findUser._id).select(
-          "-password -publicUrl"
-        );
-        const userToken = generateToken({ id: findUser._id });
-        const response = {
-          statusCode: 201,
-          success: true,
-          token: userToken,
-          user,
-          message: "User logged In Successfully",
-        };
-        return res
-          .status(200)
-          .cookie("Token", userToken, options)
-          .json(response);
-      } else if (findAgent) {
-        const agent = await AgentModel.findById(findAgent._id).select(
-          "-password -publicUrl"
-        );
-        const agentToken = generateToken({ id: findAgent._id });
-
-        const response = {
-          statusCode: 201,
-          success: true,
-          token: agentToken,
-          agent,
-          message: "Agent logged In Successfully",
-        };
-        return res
-          .status(200)
-          .cookie("Token", agentToken, options)
-          .json(response);
-      } else {
-        const admin = await UserModel.findById(findAdmin._id).select(
-          "-password -publicUrl"
-        );
-        const adminToken = generateToken({ id: findAdmin._id });
-
-        const response = {
-          statusCode: 201,
-          success: true,
-          token: adminToken,
-          admin,
-          message: "Admin logged In Successfully",
-        };
-        return res
-          .status(200)
-          .cookie("Token", adminToken, options)
-          .json(response);
-      }
-    } catch (error) {
-      const response = {
-        statusCode: 501,
-        sucess: false,
-        message: error.message,
-      };
-      return res.status(200).json(response);
+      return res.status(200).json({
+        success: true,
+        admin,
+        token: adminToken,
+        message: userMessage.SignInAdmin,
+      });
     }
-  },
-  verifyEmail: async function (req, res) {
-    try {
-      const { email } = req.body;
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
 
-      const otp = generateOTP();
+export const verifyEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
 
-      const mailFormat = `
-                <table cellpadding="0" cellspacing="0" width="100%" bgcolor="#f0f0f0">
-                <tr>
-                    <td align="center">
-                        <table width="600" cellpadding="0" cellspacing="0">
-                            <tr>
-                                <td>
-                                    <div style="padding: 20px; background-color: #ffffff; text-align: center;">
-                                    <img src="https://media.istockphoto.com/id/1300422159/photo/woman-hand-enter-a-one-time-password-for-the-validation-process-mobile-otp-secure.webp?b=1&s=170667a&w=0&k=20&c=eADS7XcHTFs4kNItYwelOtHYFVbl0RWpSuXJgjFjai4=" alt="OTP Image" width="200" height="200" style="display: block; margin: 0 auto;">
-                                        <h1>One-Time Password OTP Verification</h1>
-                                        <p>Hello there!</p>
-                                        <p>Your OTP code is: <strong style="font-size: 24px;">${otp}</strong></p>
-                                        <p>This OTP will expire in 1 minutes.</p>
-                                        <p>If you didn't request this OTP, please ignore this email.</p>
-                                        <P>Don't share your otp with someone else.</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-                </table>
-                `;
-      const mailOptions = {
-        to: email,
-        subject: "Verify Email OTP ",
-        html: mailFormat,
-      };
+    const otp = generateOTP();
 
-      // transporter.sendMail(mailOptions, async (err, info) => {
-      //   if (err) {
-      //     const response = {
-      //       statusCode: 400,
-      //       sucess: false,
-      //       message: err.message,
-      //     };
-      //     return res.status(200).json(response);
-      //   } else {
-      //     await OtpModel.findOneAndDelete({ email: email });
-      //     const user = new OtpModel({ email: email, otp: otp });
-      //     await user.save();
+    const mailFormat = `
+              <table cellpadding="0" cellspacing="0" width="100%" bgcolor="#f0f0f0">
+              <tr>
+                  <td align="center">
+                      <table width="600" cellpadding="0" cellspacing="0">
+                          <tr>
+                              <td>
+                                  <div style="padding: 20px; background-color: #ffffff; text-align: center;">
+                                  <img src="https://media.istockphoto.com/id/1300422159/photo/woman-hand-enter-a-one-time-password-for-the-validation-process-mobile-otp-secure.webp?b=1&s=170667a&w=0&k=20&c=eADS7XcHTFs4kNItYwelOtHYFVbl0RWpSuXJgjFjai4=" alt="OTP Image" width="200" height="200" style="display: block; margin: 0 auto;">
+                                      <h1>One-Time Password OTP Verification</h1>
+                                      <p>Hello there!</p>
+                                      <p>Your OTP code is: <strong style="font-size: 24px;">${otp}</strong></p>
+                                      <p>This OTP will expire in 1 minutes.</p>
+                                      <p>If you didn't request this OTP, please ignore this email.</p>
+                                      <P>Don't share your otp with someone else.</p>
+                                  </div>
+                              </td>
+                          </tr>
+                      </table>
+                  </td>
+              </tr>
+              </table>
+              `;
+    const mailOptions = {
+      to: email,
+      subject: emailMessage.VerifyEmailSubject,
+      html: mailFormat,
+    };
 
-      //     setTimeout(async () => {
-      //       await OtpModel.findOneAndDelete({ email: email });
-      //     }, 1000 * 60);
-      //   }
-      // });
+    await sendEmail(mailOptions);
+    await OtpModel.findOneAndDelete({ email });
+    const userOtp = new OtpModel({ email: email, otp: otp });
+    await userOtp.save();
 
-      await sendEmail(mailOptions);
+    setTimeout(async () => {
       await OtpModel.findOneAndDelete({ email: email });
-      const user = new OtpModel({ email: email, otp: otp });
-      await user.save();
+    }, 1000 * 60);
 
-      setTimeout(async () => {
-        await OtpModel.findOneAndDelete({ email: email });
-      }, 1000 * 60);
+    return res
+      .status(200)
+      .json({ success: true, message: userMessage.VerifyEmail });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
 
-      const response = {
-        statusCode: 201,
-        success: true,
-        message: "OTP send for E-mail Verifycation",
-      };
-      return res.status(200).json(response);
-    } catch (error) {
-      const response = {
-        statusCode: 501,
-        sucess: false,
-        message: error.message,
-      };
-      return res.status(200).json(response);
+export const verifyOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    const findUser = await OtpModel.findOne({ email });
+
+    if (!findUser) {
+      return res
+        .status(404)
+        .json({ success: false, message: errorMessage.UserNotExits });
     }
-  },
-  verifyOtp: async function (req, res) {
-    try {
-      const { email, otp } = req.body;
 
-      const findUser = await OtpModel.findOne({ email });
-
-      if (!findUser) {
-        const response = {
-          statusCode: 401,
-          sucess: false,
-          message: "OTP Not Send",
-        };
-        return res.status(200).json(response);
-      }
-
-      if (findUser.otp !== otp) {
-        const response = {
-          statusCode: 401,
-          sucess: false,
-          message: "OTP is Wrong",
-        };
-        return res.status(200).json(response);
-      }
-
-      await OtpModel.findOneAndDelete({ email: findUser.email });
-
-      const response = {
-        statusCode: 200,
-        sucess: true,
-        message: "OTP is Right",
-      };
-      return res.status(200).json(response);
-    } catch (error) {
-      const response = {
-        statusCode: 501,
-        sucess: false,
-        message: error.message,
-      };
-      return res.status(200).json(response);
+    if (findUser.otp !== otp) {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.OtpWrong });
     }
-  },
-  forgotPassword: async function (req, res) {
-    try {
-      const { email } = req.body;
-      const findUser = await UserModel.findOne({ email });
-      if (!findUser) {
-        const response = {
-          statusCode: 404,
-          success: false,
-          message: "User Not Found",
-        };
-        return res.status(200).json(response);
-      }
 
-      const otp = generateOTP();
+    await OtpModel.findOneAndDelete({ email: findUser.email });
 
-      const mailFormat = `
+    return res
+      .status(200)
+      .json({ success: true, message: userMessage.VerifyOtp });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const findUser = await UserModel.findOne({ email });
+    if (!findUser) {
+      return res
+        .status(404)
+        .json({ success: false, message: userMessage.UserNotExits });
+    }
+
+    const otp = generateOTP();
+
+    const mailFormat = `
       <table cellpadding="0" cellspacing="0" width="100%" bgcolor="#f0f0f0">
       <tr>
           <td align="center">
@@ -395,328 +307,218 @@ const UserController = {
       </table>
       `;
 
-      const mailOptions = {
-        to: findUser.email,
-        subject: "Forget Password OTP ",
-        html: mailFormat,
-      };
+    const mailOptions = {
+      to: findUser.email,
+      subject: emailMessage.ForgotPasswordSubject,
+      html: mailFormat,
+    };
 
-      // transporter.sendMail(mailOptions, async (error, info) => {
-      //   if (error) {
-      //     const response = { success: false, message: error.message };
-      //     return res.status(400).json(response);
-      //   } else {
-      //     await OtpModel.findOneAndDelete({ email: findUser.email });
-      //     const user = new OtpModel({ email: findUser.email, otp: otp });
-      //     await user.save();
+    await sendEmail(mailOptions);
+    await OtpModel.findOneAndDelete({ email: findUser.email });
+    const user = new OtpModel({ email: findUser.email, otp: otp });
+    await user.save();
 
-      //     setTimeout(async () => {
-      //       await OtpModel.findOneAndDelete({ email: findUser.email });
-      //     }, 1000 * 60);
-
-      //     const response = { success: true, message: "Otp Send" };
-      //     return res.status(200).json(response);
-      //   }
-      // });
-
-      await sendEmail(mailOptions);
+    setTimeout(async () => {
       await OtpModel.findOneAndDelete({ email: findUser.email });
-      const user = new OtpModel({ email: findUser.email, otp: otp });
-      await user.save();
+    }, 1000 * 60);
 
-      setTimeout(async () => {
-        await OtpModel.findOneAndDelete({ email: findUser.email });
-      }, 1000 * 60);
-
-      const response = { statusCode: 200, success: true, message: "Otp Send" };
-      return res.status(200).json(response);
-    } catch (error) {
-      const response = {
-        statusCode: 501,
-        sucess: false,
-        message: error.message,
-      };
-      return res.status(200).json(response);
-    }
-  },
-  resetPassword: async function (req, res) {
-    try {
-      const { email, newPassword } = req.body;
-      const findUser = await UserModel.findOne({ email });
-      if (!findUser) {
-        const response = {
-          statusCode: 404,
-          success: false,
-          message: "User Not Found",
-        };
-        return res.status(200).json(response);
-      }
-
-      findUser.password = newPassword;
-      await findUser.save();
-
-      const response = {
-        statusCode: 200,
-        success: true,
-        message: "Password is Reset Successfully",
-      };
-
-      return res.status(200).json(response);
-    } catch (error) {
-      const response = {
-        statusCode: 501,
-        sucess: false,
-        message: error.message,
-      };
-      return res.status(200).json(response);
-    }
-  },
-  changePassword: async function (req, res) {
-    try {
-      const { oldPassword, newPassword } = req.body;
-
-      const user = await UserModel.findById(req.user?._id);
-      // console.log(user);
-
-      const matchPasssword = await user.isPasswordCorrect(oldPassword);
-      // console.log(matchPasssword);
-
-      if (!matchPasssword) {
-        const response = {
-          statusCode: 400,
-          sucess: false,
-          message: "Invalid Old Password",
-        };
-        return res.status(200).json(response);
-      }
-
-      user.password = newPassword;
-      await user.save({ validateBeforeSave: false }); //validation check ny kre
-
-      const response = {
-        statusCode: 200,
-        sucess: true,
-        message: "Password change Successfully",
-      };
-      return res.status(200).json(response);
-    } catch (error) {
-      const response = {
-        statusCode: 501,
-        sucess: false,
-        message: error.message,
-      };
-      return res.status(200).json(response);
-    }
-  },
-  getCurrentUser: async function (req, res) {
-    try {
-      const response = {
-        statusCode: 201,
-        sucess: true,
-        userData: req.user,
-        message: "User Fetched Successfully",
-      };
-      return res.status(200).json(response);
-    } catch (error) {
-      const response = {
-        statusCode: 501,
-        sucess: false,
-        message: error.message,
-      };
-      return res.status(200).json(response);
-    }
-  },
-  changeProfilePic: async function (req, res) {
-    try {
-      const user = await UserModel.findById(req.user?._id);
-
-      if (!user) {
-        const response = {
-          statusCode: 404,
-          sucess: false,
-          message: "User Not Found",
-        };
-        return res.status(200).json(response);
-      }
-
-      const profilePicLocalPath = req.file?.path;
-
-      if (!profilePicLocalPath) {
-        const response = {
-          statusCode: 404,
-          sucess: false,
-          message: "Profile Picture Not Found",
-        };
-        return res.status(200).json(response);
-      }
-
-      if (user.publicUrl !== null) {
-        await fileDestroyInCloudinary(user.publicUrl);
-      }
-
-      const profilePicInCloudinary = await fileUploadInCloudinary(
-        profilePicLocalPath
-      );
-
-      user.profilePic = profilePicInCloudinary.secure_url;
-      user.publicUrl = profilePicInCloudinary.public_id;
-
-      await user.save();
-
-      const response = {
-        statusCode: 200,
-        sucess: true,
-        message: "Profile Picture Change Successfully",
-      };
-      return res.status(200).json(response);
-    } catch (error) {
-      const response = {
-        statusCode: 501,
-        sucess: false,
-        message: error.message,
-      };
-      return res.status(200).json(response);
-    }
-  },
-  deleteProfilePic: async function (req, res) {
-    try {
-      const user = await UserModel.findById(req.user?._id);
-
-      if (!user) {
-        const response = {
-          statusCode: 404,
-          sucess: false,
-          message: "User Not Found",
-        };
-        return res.status(200).json(response);
-      }
-
-      await fileDestroyInCloudinary(user.publicUrl);
-
-      const nameFirstLetter = user.name.toLowerCase().slice(0, 1);
-      const url = publicUrl(nameFirstLetter);
-      user.profilePic = url;
-      user.publicUrl = null;
-      await user.save();
-
-      const response = {
-        statusCode: 200,
-        sucess: true,
-        message: "Profile Pic Deleted Successfulyy",
-      };
-      return res.status(200).json(response);
-    } catch (error) {
-      const response = {
-        statusCode: 501,
-        sucess: false,
-        message: error.message,
-      };
-      return res.status(200).json(response);
-    }
-  },
-  googleLoginUser: async function (req, res) {
-    try {
-      const token = req.body.token;
-      const ticket = await client.verifyIdToken({
-        idToken: token,
-        audience: process.env.CLIENTID,
-      });
-      let payload = ticket.getPayload();
-      const findUser = await UserModel.findOne({ email: payload.email });
-      if (findUser) {
-        const userToken = generateToken(findUser._id);
-        const response = {
-          success: true,
-          data: findUser.getData(),
-          message: "SignIn successfully",
-          token: userToken,
-        };
-        return res.status(200).json(response);
-      }
-      const result = await uploads(payload.picture, "profile");
-      const newUser = new UserModel({
-        name: payload.name,
-        email: payload.email,
-        profilePic: result.secure_url,
-        publicUrl: result.public_id,
-        isLogin: true,
-      });
-      await newUser.save();
-      const userData = newUser.getData();
-      const userToken = generateToken(newUser._id);
-      const emailTemp = `
-      <table cellpadding="0" cellspacing="0" width="100%" bgcolor="#f0f0f0">
-  <tr>
-      <td align="center">
-          <table width="600" cellpadding="0" cellspacing="0">
-              <tr>
-                  <td>
-                      <div style="padding: 20px; background-color: white; text-align: center;">
-                      <img src="https://media.istockphoto.com/id/1472307744/photo/clipboard-and-pencil-on-blue-background-notepad-icon-clipboard-task-management-todo-check.webp?b=1&s=170667a&w=0&k=20&c=WfRoNKWq5Dr-23RuNifv1kbIR1LVuZAsCzzSH2I3HsY=" alt="Logo" width="200" height="100" style="display: block; margin: 0 auto;">
-                          <h1>Welcome to Our Service!</h1>
-                          <p>Dear ${userData.name},</p>
-                          <p>Thank you for registering with Our app. You're now a part of our community.</p>
-                          <p>Your account details:</p>
-                          
-                          <strong>Username:</strong> ${userData.name}<br>
-                          <strong>Email:</strong> ${userData.email}
-                          
-                          <p>We're excited to have you on board, and you can start using our service right away.</p>
-                          <p>If you have any questions or need assistance, please don't hesitate to contact our support team at pradiptimbadiya@gmail.com.</p>
-                          <p>Best regards,</p>
-                          <p>Todolist</p>
-                      </div>
-                  </td>
-              </tr>
-          </table>
-      </td>
-  </tr>
-</table>
-
-      `;
-      // transporter.sendMail(
-      //   {
-      //     to: userData.email,
-      //     subject: "Home-Hub Market",
-      //     html: emailTemp,
-      //   },
-      //   (err, info) => {
-      //     if (err) {
-      //     } else {
-      //       console.log("Email Sent : " + info.response);
-      //     }
-      //   }
-      // );
-      await sendEmail(
-        {
-          to: userData.email,
-          subject: "Home-Hub Market",
-          html: emailTemp,
-        },
-        (err, info) => {
-          if (err) {
-          } else {
-            console.log("Email Sent : " + info.response);
-          }
-        }
-      );
-      const response = {
-        statusCode: 201,
-        success: true,
-        data: userData,
-        message: "New User Created",
-        token: userToken,
-      };
-      return res.status(200).json(response);
-    } catch (error) {
-      const response = {
-        statusCode: 501,
-        success: false,
-        message: error.message,
-      };
-      return res.status(400).json(response);
-    }
-  },
+    return res
+      .status(200)
+      .json({ success: true, message: userMessage.ForgotPassword });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
 };
 
-export { UserController };
+export const resetPassword = async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+    const findUser = await UserModel.findOne({ email });
+    if (!findUser) {
+      return res
+        .status(404)
+        .json({ success: false, message: errorMessage.UserNotExits });
+    }
+
+    findUser.password = newPassword;
+    await findUser.save();
+
+    return res
+      .status(200)
+      .json({ sucess: true, message: userMessage.ResetPassword });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const changePassword = async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+
+    const user = await UserModel.findById(req.user?._id);
+
+    const matchPasssword = await user.isPasswordCorrect(oldPassword);
+
+    if (!matchPasssword) {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.PasswordWrong });
+    }
+
+    user.password = newPassword;
+    await user.save({ validateBeforeSave: false }); //validation check ny kre
+
+    return res
+      .status(200)
+      .json({ success: true, message: userMessage.ChangePassword });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const getCurrentUser = async (req, res) => {
+  try {
+    return res.status(200).json({
+      success: true,
+      userData: req.user,
+      message: userMessage.GetCurrentUser,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const changeProfilePic = async (req, res) => {
+  try {
+    const user = req.user;
+
+    const profilePicLocalPath = req.file?.path;
+    console.log(profilePicLocalPath);
+
+    if (!profilePicLocalPath) {
+      return res
+        .status(404)
+        .json({ success: false, message: errorMessage.ProfilePicNotFound });
+    }
+
+    if (user.publicUrl !== null) {
+      await fileDestroyInCloudinary(user.publicUrl);
+    }
+
+    const profilePicInCloudinary = await fileUploadInCloudinary(
+      profilePicLocalPath
+    );
+
+    user.profilePic = profilePicInCloudinary.secure_url;
+    user.publicUrl = profilePicInCloudinary.public_id;
+
+    await user.save();
+
+    return res
+      .status(200)
+      .json({ success: true, message: userMessage.ChangeProfilePic });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const deleteProfilePic = async (req, res) => {
+  try {
+    const user = req.user;
+
+    await fileDestroyInCloudinary(user.publicUrl);
+
+    const nameFirstLetter = user.name.toLowerCase().slice(0, 1);
+    const url = publicUrl(nameFirstLetter);
+    user.profilePic = url;
+    user.publicUrl = null;
+    await user.save();
+
+    return res
+      .status(200)
+      .json({ success: true, message: userMessage.DeleteProfilePic });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const googleLoginUser = async (req, res) => {
+  try {
+    const token = req.body.token;
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.CLIENTID,
+    });
+    let payload = ticket.getPayload();
+    const findUser = await UserModel.findOne({ email: payload.email });
+    if (findUser) {
+      const userToken = generateToken(findUser._id);
+
+      return res.status(200).json({
+        success: true,
+        userData: findUser.getData(),
+        token: userToken,
+        message: userMessage.SignInUser,
+      });
+    }
+    const result = await uploads(payload.picture, "profile");
+    const newUser = new UserModel({
+      name: payload.name,
+      email: payload.email,
+      profilePic: result.secure_url,
+      publicUrl: result.public_id,
+      isLogin: true,
+    });
+    await newUser.save();
+    const userData = newUser.getData();
+    const userToken = generateToken(newUser._id);
+
+    const emailTemp = `
+    <table cellpadding="0" cellspacing="0" width="100%" bgcolor="#f0f0f0">
+<tr>
+    <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0">
+            <tr>
+                <td>
+                    <div style="padding: 20px; background-color: white; text-align: center;">
+                    <img src="https://media.istockphoto.com/id/1472307744/photo/clipboard-and-pencil-on-blue-background-notepad-icon-clipboard-task-management-todo-check.webp?b=1&s=170667a&w=0&k=20&c=WfRoNKWq5Dr-23RuNifv1kbIR1LVuZAsCzzSH2I3HsY=" alt="Logo" width="200" height="100" style="display: block; margin: 0 auto;">
+                        <h1>Welcome to Our Service!</h1>
+                        <p>Dear ${userData.name},</p>
+                        <p>Thank you for registering with Our app. You're now a part of our community.</p>
+                        <p>Your account details:</p>
+                        
+                        <strong>Username:</strong> ${userData.name}<br>
+                        <strong>Email:</strong> ${userData.email}
+                        
+                        <p>We're excited to have you on board, and you can start using our service right away.</p>
+                        <p>If you have any questions or need assistance, please don't hesitate to contact our support team at pradiptimbadiya@gmail.com.</p>
+                        <p>Best regards,</p>
+                        <p>Todolist</p>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </td>
+</tr>
+</table>
+
+    `;
+
+    const mailOptions = {
+      to: userData.email,
+      subject: "Home-Hub Market",
+      html: emailTemp,
+    };
+
+    await sendEmail(mailOptions);
+
+    return res.status(201).json({
+      success: true,
+      User: userData,
+      token: userToken,
+      message: userMessage.GoogleLoginUser,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};

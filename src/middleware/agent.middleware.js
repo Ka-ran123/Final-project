@@ -1,13 +1,14 @@
 import { verifyToken } from "../utils/genToken.js";
 import { JWT_SECRET_KEY } from "../config/config.js";
-import { UserModel } from "../model/user.model.js";
+import { AgentModel } from "../model/agent.model.js";
 import { Message } from "../config/message.js";
 
 const { errorMessage } = Message;
 
-export const verifyUser = async (req, res, next) => {
+export const verifyAgent = async (req, res, next) => {
   try {
     const token = req.headers["authorization"]?.split(" ")[1];
+
     if (!token) {
       return res
         .status(401)
@@ -15,16 +16,19 @@ export const verifyUser = async (req, res, next) => {
     }
 
     const decodeToken = verifyToken(token, JWT_SECRET_KEY);
+    console.log(decodeToken);
 
-    const user = await UserModel.findById(decodeToken?.id).select("-password");
+    const agent = await AgentModel.findById(decodeToken?.id).select(
+      "-password"
+    );
 
-    if (!user) {
+    if (!agent) {
       return res
         .status(401)
         .json({ sucess: false, message: errorMessage.InvalidUserToken });
     }
 
-    req.user = user;
+    req.user = agent;
 
     next();
   } catch (error) {

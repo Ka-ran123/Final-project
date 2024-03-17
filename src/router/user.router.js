@@ -1,22 +1,37 @@
 import { Router } from "express";
-import { UserController } from "../controller/user.controller.js";
 import { verifyUser } from "../middleware/auth.middleware.js";
 import { upload } from "../middleware/multer.middleware.js";
-const router = Router()
+import {
+  signUp,
+  signIn,
+  verifyEmail,
+  verifyOtp,
+  forgotPassword,
+  resetPassword,
+  changePassword,
+  changeProfilePic,
+  deleteProfilePic,
+  googleLoginUser,
+  getCurrentUser,
+} from "../controller/user.controller.js";
+const router = Router();
 
-router.post('/sign-up' , UserController.signUp);
-router.post('/sign-in' , UserController.signIn);
-router.post('/verify-email' , UserController.verifyEmail);
-router.post('/verify-otp' , UserController.verifyOtp);
-router.post('/forgot-password' , UserController.forgotPassword);
-router.post('/reset-password',UserController.resetPassword);
-router.post('/change-password',verifyUser,UserController.changePassword);
-router.post('/change-profilePic' , verifyUser,upload.single('profilePic') ,UserController.changeProfilePic)
-router.delete('/delete-profilePic' , verifyUser,UserController.deleteProfilePic)
-router.post('/google-login' , UserController.googleLoginUser);
+router.post("/sign-up", signUp);
+router.post("/sign-in", signIn);
+router.post("/verify-email", verifyEmail);
+router.post("/verify-otp", verifyOtp);
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", resetPassword);
+router.post("/change-password", verifyUser, changePassword);
+router.post(
+  "/change-profilePic",
+  verifyUser,
+  upload.single("profilePic"),
+  changeProfilePic
+);
+router.delete("/delete-profilePic", verifyUser, deleteProfilePic);
+router.post("/google-login", googleLoginUser);
 
+router.get("/get-user", verifyUser, getCurrentUser);
 
-router.get('/get-user',verifyUser,UserController.getCurrentUser);
-export const userRouter = router
-
-
+export const userRouter = router;
