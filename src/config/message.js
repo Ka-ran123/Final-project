@@ -13,6 +13,7 @@ export const Message = {
             ChangeProfilePic:"Profile Picture Change Successfully",
             DeleteProfilePic:"Profile Picture Delete Successfully",
             GoogleLoginUser:"New User Created Using Google",
+            TotalUser:"Total User Count"
         },
         propertyMessage:{
             AddProperty:"Property Add Successfully",
@@ -24,12 +25,16 @@ export const Message = {
             GetOnlySellProperty:"List Of Sell Property",
             GetOnlyRentProperty:"List Of Rent Property",
             SetApproveProperty:"Property Status :- Approval",
-            SetCancelProperty:"Property Status :- Cancel"
+            SetCancelProperty:"Property Status :- Cancel",
+            TotalProperty:"Total Property Count",
+            TotalRentProperty:"Total Rent Property Count",
+            TotalSellProperty:"Total Sell Property Count"
         },
         agentMessage:{
             AddAgent:"Agent Sign-up Successfully",
             GetAllAgent:"List Of All Agent",
             AgentMetting:"Email Send Successfully",
+            TotalAgent:"Total Agent Count"
         },
         errorMessage:{
             NotEnterValidFeilds:"Please Enter Valid Fiedls",
@@ -45,7 +50,9 @@ export const Message = {
             ProfilePicNotFound:"Profile Picture Not Found",
             InvalidData:"Invalid Data",
             UserCantChange:"User Can Not Change",
+            UserCantSeeTotal:"User Can Not See Total Property",
             PropertyNotFound:"Property Does Not Found",
+            UserNotFound:"User Does Not Found",
             AgentAlreadyExits:"Agent Already Exits",
         },
         emailMessage:{

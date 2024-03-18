@@ -275,3 +275,84 @@ export const setCancelProperty = async (req, res) => {
     return res.status(501).json({ success: false, message: error.message });
   }
 };
+
+export const totalPropertyCount = async (req, res) => {
+  try {
+    const admin = req.user;
+
+    if (admin.role === "USER") {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.UserCantSeeTotal });
+    }
+
+    const property = await PropertyModel.find().count();
+    if (!property) {
+      return res
+        .status(404)
+        .json({ success: false, message: errorMessage.PropertyNotFound });
+    }
+
+    return res.status(200).json({
+      success: true,
+      property,
+      message: propertyMessage.TotalProperty,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const totalRentPropertyCount = async (req, res) => {
+  try {
+    const admin = req.user;
+
+    if (admin.role === "USER") {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.UserCantSeeTotal });
+    }
+
+    const property = await PropertyModel.find({type:"Rent"}).count();
+    if (!property) {
+      return res
+        .status(404)
+        .json({ success: false, message: errorMessage.PropertyNotFound });
+    }
+
+    return res.status(200).json({
+      success: true,
+      property,
+      message: propertyMessage.TotalRentProperty,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const totalSellPropertyCount = async (req, res) => {
+  try {
+    const admin = req.user;
+
+    if (admin.role === "USER") {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.UserCantSeeTotal });
+    }
+
+    const property = await PropertyModel.find({type:"Sell"}).count();
+    if (!property) {
+      return res
+        .status(404)
+        .json({ success: false, message: errorMessage.PropertyNotFound });
+    }
+
+    return res.status(200).json({
+      success: true,
+      property,
+      message: propertyMessage.TotalSellProperty,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};

@@ -231,3 +231,30 @@ export const verifyEmail = async (req, res) => {
     return res.status(501).json({ success: false, message: error.message });
   }
 };
+
+export const totalAgentCount = async (req, res) => {
+  try {
+    const admin = req.user;
+
+    if (admin.role === "USER") {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.UserCantSeeTotal });
+    }
+
+    const agents = await AgentModel.find().count();
+    if (!agents) {
+      return res
+        .status(404)
+        .json({ success: false, message: errorMessage.UserNotFound });
+    }
+
+    return res.status(200).json({
+      success: true,
+      agents,
+      message: agentMessage.TotalAgent,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
