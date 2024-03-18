@@ -13,7 +13,8 @@ export const Message = {
             ChangeProfilePic:"Profile Picture Change Successfully",
             DeleteProfilePic:"Profile Picture Delete Successfully",
             GoogleLoginUser:"New User Created Using Google",
-            TotalUser:"Total User Count"
+            TotalUser:"Total User Count",
+            LogOut:"Log-Out Successfully"
         },
         propertyMessage:{
             AddProperty:"Property Add Successfully",

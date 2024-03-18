@@ -13,10 +13,13 @@ export const verifyUser = async (req, res, next) => {
         .status(401)
         .json({ sucess: false, message: errorMessage.UnauthorizedRequest });
     }
+    // console.log(token);
 
     const decodeToken = verifyToken(token, JWT_SECRET_KEY);
+    // console.log(decodeToken?.id);
 
     const user = await UserModel.findById(decodeToken?.id).select("-password");
+    // console.log(user);
 
     if (!user) {
       return res
