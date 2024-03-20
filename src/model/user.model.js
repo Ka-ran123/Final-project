@@ -23,7 +23,7 @@ const userSchema = new Schema(
     },
     mobileNo: {
       type: String,
-      required: true,
+      // required: true,
       trim: true,
       validate(value) {
         if (
@@ -37,7 +37,7 @@ const userSchema = new Schema(
     },
     password: {
       type: String,
-      required: true,
+      // required: true,
       trim: true,
     },
     profilePic: {

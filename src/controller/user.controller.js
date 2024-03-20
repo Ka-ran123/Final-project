@@ -9,8 +9,9 @@ import {
   fileDestroyInCloudinary,
   fileUploadInCloudinary,
 } from "../utils/clodinary.js";
-
 import { Message } from "../config/message.js";
+import { OAuth2Client } from "google-auth-library";
+const  client = new OAuth2Client(process.env.CLIENTID)
 
 const { userMessage, errorMessage, emailMessage } = Message;
 
@@ -452,8 +453,7 @@ export const googleLoginUser = async (req, res) => {
     let payload = ticket.getPayload();
     const findUser = await UserModel.findOne({ email: payload.email });
     if (findUser) {
-      const userToken = generateToken(findUser._id);
-
+      const userToken = generateToken({ id: findUser._id });
       return res.status(200).json({
         success: true,
         userData: findUser.getData(),
@@ -461,7 +461,7 @@ export const googleLoginUser = async (req, res) => {
         message: userMessage.SignInUser,
       });
     }
-    const result = await uploads(payload.picture, "profile");
+    const result = await fileUploadInCloudinary(payload.picture);
     const newUser = new UserModel({
       name: payload.name,
       email: payload.email,
@@ -470,9 +470,7 @@ export const googleLoginUser = async (req, res) => {
       isLogin: true,
     });
     await newUser.save();
-    const userData = newUser.getData();
-    const userToken = generateToken(newUser._id);
-
+    const userToken = generateToken({ id: newUser._id });
     const emailTemp = `
     <table cellpadding="0" cellspacing="0" width="100%" bgcolor="#f0f0f0">
 <tr>
@@ -483,17 +481,17 @@ export const googleLoginUser = async (req, res) => {
                     <div style="padding: 20px; background-color: white; text-align: center;">
                     <img src="https://media.istockphoto.com/id/1472307744/photo/clipboard-and-pencil-on-blue-background-notepad-icon-clipboard-task-management-todo-check.webp?b=1&s=170667a&w=0&k=20&c=WfRoNKWq5Dr-23RuNifv1kbIR1LVuZAsCzzSH2I3HsY=" alt="Logo" width="200" height="100" style="display: block; margin: 0 auto;">
                         <h1>Welcome to Our Service!</h1>
-                        <p>Dear ${userData.name},</p>
+                        <p>Dear ${newUser.name},</p>
                         <p>Thank you for registering with Our app. You're now a part of our community.</p>
                         <p>Your account details:</p>
                         
-                        <strong>Username:</strong> ${userData.name}<br>
-                        <strong>Email:</strong> ${userData.email}
+                        <strong>Username:</strong> ${newUser.name}<br>
+                        <strong>Email:</strong> ${newUser.email}
                         
                         <p>We're excited to have you on board, and you can start using our service right away.</p>
                         <p>If you have any questions or need assistance, please don't hesitate to contact our support team at pradiptimbadiya@gmail.com.</p>
                         <p>Best regards,</p>
-                        <p>Todolist</p>
+                        <p>Home-Hub Market</p>
                     </div>
                 </td>
             </tr>
@@ -505,12 +503,13 @@ export const googleLoginUser = async (req, res) => {
     `;
 
     const mailOptions = {
-      to: userData.email,
+      to: newUser.email,
       subject: "Home-Hub Market",
       html: emailTemp,
     };
 
     await sendEmail(mailOptions);
+    const userData = newUser.getData();
 
     return res.status(201).json({
       success: true,
