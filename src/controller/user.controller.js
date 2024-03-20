@@ -158,7 +158,7 @@ export const signIn = async (req, res) => {
 
       return res.status(200).json({
         success: true,
-        user,
+        data:user,
         token: userToken,
         message: userMessage.SignInUser,
       });
@@ -170,7 +170,7 @@ export const signIn = async (req, res) => {
 
       return res.status(200).json({
         success: true,
-        agent,
+        data:agent,
         token: agentToken,
         message: userMessage.SignInAgent,
       });
@@ -182,7 +182,7 @@ export const signIn = async (req, res) => {
 
       return res.status(200).json({
         success: true,
-        admin,
+        data:admin,
         token: adminToken,
         message: userMessage.SignInAdmin,
       });

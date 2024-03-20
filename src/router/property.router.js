@@ -4,7 +4,6 @@ import { upload } from "../middleware/multer.middleware.js";
 import {
   addProperty,
   getAllProperty,
-  getAllSelectedProperty,
   getUserAllProperty,
   getUserPendingProperty,
   getUserApprovalProperty,
@@ -25,7 +24,7 @@ router.post(
   addProperty
 );
 router.get("/getall-property", verifyUser, getAllProperty);
-router.get("/get-selected-property/:key",verifyUser,getAllSelectedProperty);
+
 router.get("/getuserall-property", verifyUser, getUserAllProperty);
 router.get("/getuserpending-property", verifyUser, getUserPendingProperty);
 router.get("/getuserapproval-property", verifyUser, getUserApprovalProperty);
