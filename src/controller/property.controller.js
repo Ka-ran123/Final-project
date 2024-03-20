@@ -11,6 +11,7 @@ export const addProperty = async (req, res) => {
     const user = req.user;
 
     const data = req.body;
+    // console.log(data);
 
     if (user.email !== data.email && user.mobileNo !== data.mobileNo) {
       return res
@@ -23,6 +24,7 @@ export const addProperty = async (req, res) => {
         .status(404)
         .json({ success: false, message: errorMessage.InvalidData });
     }
+    console.log(req.files);
 
     const image = [];
     for (let i = 0; i < req.files.length; i++) {
@@ -30,6 +32,7 @@ export const addProperty = async (req, res) => {
       image.push(result.secure_url);
     }
 
+    // console.log(image);
     const userCity = data.city;
 
     const findAgent = await AgentModel.findOne({ city: userCity });
@@ -313,7 +316,7 @@ export const totalRentPropertyCount = async (req, res) => {
         .json({ success: false, message: errorMessage.UserCantSeeTotal });
     }
 
-    const property = await PropertyModel.find({type:"Rent"}).count();
+    const property = await PropertyModel.find({ type: "Rent" }).count();
     if (!property) {
       return res
         .status(404)
@@ -340,7 +343,7 @@ export const totalSellPropertyCount = async (req, res) => {
         .json({ success: false, message: errorMessage.UserCantSeeTotal });
     }
 
-    const property = await PropertyModel.find({type:"Sell"}).count();
+    const property = await PropertyModel.find({ type: "Sell" }).count();
     if (!property) {
       return res
         .status(404)
