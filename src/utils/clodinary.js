@@ -18,7 +18,7 @@ const fileUploadInCloudinary = async (localfilepath)=>{
           // folder:"profile_picture"      
         });
         // console.log(response);
-        fs.unlinkSync(localfilepath)   //upload successfully when remove file from locally
+        // fs.unlinkSync(localfilepath)   //upload successfully when remove file from locally
         return response;
     } catch (error) {     
       fs.unlinkSync(localfilepath)  //remove the file from locally saved temporary file
