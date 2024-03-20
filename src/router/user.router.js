@@ -13,7 +13,6 @@ import {
   deleteProfilePic,
   googleLoginUser,
   getCurrentUser,
-  totalUserCount
 } from "../controller/user.controller.js";
 const router = Router();
 
@@ -34,7 +33,7 @@ router.delete("/delete-profilePic", verifyUser, deleteProfilePic);
 router.post("/google-login", googleLoginUser);
 
 router.get("/get-user", verifyUser, getCurrentUser);
-router.get("/total-user-count", verifyUser, totalUserCount);
 
+// router.get("/log-out" , verifyUser ,logOutUser )
 
 export const userRouter = router;

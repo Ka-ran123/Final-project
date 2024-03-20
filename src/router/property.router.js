@@ -14,9 +14,6 @@ import {
   getAllPropertyForApp,
   getOnlySellProperty,
   getOnlyRentProperty,
-  totalPropertyCount,
-  totalRentPropertyCount,
-  totalSellPropertyCount
 } from "../controller/property.controller.js";
 
 const router = Router();
@@ -39,10 +36,5 @@ router.post("/set-cancelproperty", verifyUser, setCancelProperty);
 router.get("/getall-property", getAllPropertyForApp);
 router.get("/getall-sellproperty", getOnlySellProperty);
 router.get("/getall-rentproperty", getOnlyRentProperty);
-
-router.get("/total-property-count",verifyUser, totalPropertyCount);
-router.get("/total-rentproperty-count",verifyUser, totalRentPropertyCount);
-router.get("/total-sellproperty-count",verifyUser, totalSellPropertyCount);
-
 
 export const propertyRouter = router;

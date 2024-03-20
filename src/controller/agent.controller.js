@@ -207,6 +207,7 @@ export const verifyEmail = async (req, res) => {
                                           <a href="${`https://homehubmarket-b65c6.web.app/agent/`}">💥Click this link to fill form💥</a>
                                           <p>Best regards</p>
                                           <p>Home-Hub Market</p>
+                                         
                                       </div>
                                   </td>
                               </tr>
