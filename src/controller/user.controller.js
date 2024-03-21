@@ -1,7 +1,7 @@
 import { UserModel } from "../model/user.model.js";
 import { AgentModel } from "../model/agent.model.js";
 import { generateToken } from "../utils/genToken.js";
-import { transporter, sendEmail } from "../utils/nodemailer.js";
+import { sendEmail } from "../utils/nodemailer.js";
 import { generateOTP } from "../utils/genOtp.js";
 import { OtpModel } from "../model/otp.model.js";
 import { publicUrl } from "../utils/profilepic.js";
