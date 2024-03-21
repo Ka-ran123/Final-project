@@ -558,3 +558,30 @@ export const totalUserCount = async (req, res) => {
     return res.status(501).json({ success: false, message: error.message });
   }
 };
+
+export const totalUser = async (req, res) => {
+  try {
+    const admin = req.user;
+
+    if (admin.role === "USER") {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.UserCantSee });
+    }
+
+    const users = await UserModel.find({role:"USER"});
+    if (!users) {
+      return res
+        .status(404)
+        .json({ success: false, message: errorMessage.UserNotFound });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data:users,
+      message: userMessage.TotalUser,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
