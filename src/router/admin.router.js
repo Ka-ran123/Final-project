@@ -7,7 +7,8 @@ import {
   totalRentPropertyCount,
   getAllPropertyForAdmin,
   getOnlyRentPropertyForAdmin,
-  getOnlySellPropertyForAdmin
+  getOnlySellPropertyForAdmin,
+  getAllSelectedProperty
 } from "../controller/property.controller.js";
 import { totalAgentCount,totalAgent } from "../controller/agent.controller.js";
 import { verifyUser } from "../middleware/auth.middleware.js";
