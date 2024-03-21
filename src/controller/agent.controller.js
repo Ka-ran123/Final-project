@@ -247,7 +247,34 @@ export const totalAgentCount = async (req, res) => {
     if (!agents) {
       return res
         .status(404)
-        .json({ success: false, message: errorMessage.UserNotFound });
+        .json({ success: false, message: errorMessage.AgentNotFound });
+    }
+
+    return res.status(200).json({
+      success: true,
+      agents,
+      message: agentMessage.TotalAgent,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const totalAgent = async (req, res) => {
+  try {
+    const admin = req.user;
+
+    if (admin.role === "USER") {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.UserCantSee });
+    }
+
+    const agents = await AgentModel.find();
+    if (!agents) {
+      return res
+        .status(404)
+        .json({ success: false, message: errorMessage.AgentNotFound });
     }
 
     return res.status(200).json({

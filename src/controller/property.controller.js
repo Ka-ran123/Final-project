@@ -208,7 +208,6 @@ export const getUserCancleProperty = async (req, res) => {
 export const getAllPropertyForApp = async (_, res) => {
   try {
     const allProperty = await PropertyModel.find();
-    console.log(allProperty);
     if (!allProperty) {
       return res
         .status(400)
@@ -330,7 +329,7 @@ export const totalPropertyCount = async (req, res) => {
         .json({ success: false, message: errorMessage.UserCantSeeTotal });
     }
 
-    const property = await PropertyModel.find().count();
+    const property = await PropertyModel.find({status:"approval"}).count();
     if (!property) {
       return res
         .status(404)
@@ -357,7 +356,9 @@ export const totalRentPropertyCount = async (req, res) => {
         .json({ success: false, message: errorMessage.UserCantSeeTotal });
     }
 
-    const property = await PropertyModel.find({ type: "Rent" }).count();
+    const property = await PropertyModel.find({
+      $and: [{ type: { $eq: "Rent" }, status: { $eq: "approval" } }],
+    }).count();
     if (!property) {
       return res
         .status(404)
@@ -384,7 +385,9 @@ export const totalSellPropertyCount = async (req, res) => {
         .json({ success: false, message: errorMessage.UserCantSeeTotal });
     }
 
-    const property = await PropertyModel.find({ type: "Sell" }).count();
+    const property = await PropertyModel.find({
+      $and: [{ type: { $eq: "Sell" }, status: { $eq: "approval" } }],
+    }).count();
     if (!property) {
       return res
         .status(404)
@@ -395,6 +398,80 @@ export const totalSellPropertyCount = async (req, res) => {
       success: true,
       property,
       message: propertyMessage.TotalSellProperty,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const getAllPropertyForAdmin = async (req, res) => {
+  try {
+    const admin = req.user;
+
+    if (admin.role === "USER") {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.UserCantSee });
+    }
+
+    const allProperty = await PropertyModel.find({status:"approval"});
+    if (!allProperty) {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.InvalidData });
+    }
+    return res.status(200).json({
+      success: true,
+      allProperty,
+      message: propertyMessage.GetAllProperty,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const getOnlySellPropertyForAdmin = async (req, res) => {
+  try {
+    const admin = req.user;
+
+    if (admin.role === "USER") {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.UserCantSee });
+    }
+
+    const allProperty = await PropertyModel.find({
+      $and: [{ type: { $eq: "Sell" }, status: { $eq: "approval" } }],
+    });
+
+    return res.status(200).json({
+      success: true,
+      allProperty,
+      message: propertyMessage.GetOnlySellProperty,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const getOnlyRentPropertyForAdmin = async (req, res) => {
+  try {
+    const admin = req.user;
+
+    if (admin.role === "USER") {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.UserCantSee });
+    }
+
+    const allProperty = await PropertyModel.find({
+      $and: [{ type: { $eq: "Rent" }, status: { $eq: "approval" } }],
+    });
+
+    return res.status(200).json({
+      success: true,
+      allProperty,
+      message: propertyMessage.GetOnlyRentProperty,
     });
   } catch (error) {
     return res.status(501).json({ success: false, message: error.message });

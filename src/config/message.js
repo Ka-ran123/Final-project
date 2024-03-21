@@ -51,9 +51,11 @@ export const Message = {
             ProfilePicNotFound:"Profile Picture Not Found",
             InvalidData:"Invalid Data",
             UserCantChange:"User Can Not Change",
+            UserCantSee:"User Can Not See",
             UserCantSeeTotal:"User Can Not See Total Property",
-            PropertyNotFound:"Property Does Not Found",
+            UserCantSee:"User Can Not See All User",            PropertyNotFound:"Property Does Not Found",
             UserNotFound:"User Does Not Found",
+            AgentNotFound:"Agent Does Not Found",
             AgentAlreadyExits:"Agent Already Exits",
         },
         emailMessage:{
