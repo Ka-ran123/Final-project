@@ -13,7 +13,7 @@ import {
   deleteProfilePic,
   googleLoginUser,
   getCurrentUser,
-  logOutUser
+  logOutUser,
 } from "../controller/user.controller.js";
 const router = Router();
 
@@ -35,6 +35,6 @@ router.post("/google-login", googleLoginUser);
 
 router.get("/get-user", verifyUser, getCurrentUser);
 
-router.get("/log-out" , verifyUser ,logOutUser )
+router.get("/log-out", verifyUser, logOutUser);
 
 export const userRouter = router;

@@ -1,6 +1,6 @@
 import { Router } from "express";
 const router = Router();
-import { totalUserCount ,totalUser} from "../controller/user.controller.js";
+import { totalUserCount, totalUser } from "../controller/user.controller.js";
 import {
   totalPropertyCount,
   totalSellPropertyCount,
@@ -8,9 +8,9 @@ import {
   getAllPropertyForAdmin,
   getOnlyRentPropertyForAdmin,
   getOnlySellPropertyForAdmin,
-  getAllSelectedProperty
+  getAllSelectedProperty,
 } from "../controller/property.controller.js";
-import { totalAgentCount,totalAgent } from "../controller/agent.controller.js";
+import { totalAgentCount, totalAgent } from "../controller/agent.controller.js";
 import { verifyUser } from "../middleware/auth.middleware.js";
 
 router.get("/total-user-count", verifyUser, totalUserCount);
@@ -21,10 +21,17 @@ router.get("/total-property-count", verifyUser, totalPropertyCount);
 router.get("/total-rentproperty-count", verifyUser, totalRentPropertyCount);
 router.get("/total-sellproperty-count", verifyUser, totalSellPropertyCount);
 router.get("/getall-property-admin", verifyUser, getAllPropertyForAdmin);
-router.get("/getall-rentproperty-admin", verifyUser, getOnlyRentPropertyForAdmin);
-router.get("/getall-sellproperty-admin", verifyUser, getOnlySellPropertyForAdmin);
+router.get(
+  "/getall-rentproperty-admin",
+  verifyUser,
+  getOnlyRentPropertyForAdmin
+);
+router.get(
+  "/getall-sellproperty-admin",
+  verifyUser,
+  getOnlySellPropertyForAdmin
+);
 
-
-router.get("/get-selected-property/:key",verifyUser,getAllSelectedProperty);
+router.get("/get-selected-property/:key", verifyUser, getAllSelectedProperty);
 
 export const adminRouter = router;

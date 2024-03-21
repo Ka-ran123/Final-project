@@ -58,10 +58,14 @@ export const Message = {
     UserNotFound: "User Does Not Found",
     AgentNotFound: "Agent Does Not Found",
     AgentAlreadyExits: "Agent Already Exits",
+    AdminCantSend: "Admin Can Not Send Feedback",
   },
   emailMessage: {
     SignupSubject: "Signup Successfully in Home Hub Market",
     VerifyEmailSubject: "Verify Email OTP",
     ForgotPasswordSubject: "Forget Password OTP",
   },
+  feedbackMessage:{
+    SubmitFeedback: "Feedback submitted successfully",
+  }
 };

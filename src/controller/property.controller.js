@@ -1,5 +1,4 @@
 import { PropertyModel } from "../model/property.model.js";
-import { UserModel } from "../model/user.model.js";
 import { AgentModel } from "../model/agent.model.js";
 import { fileUploadInCloudinary } from "../utils/clodinary.js";
 import { Message } from "../config/message.js";
