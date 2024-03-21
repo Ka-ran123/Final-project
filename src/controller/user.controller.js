@@ -158,7 +158,7 @@ export const signIn = async (req, res) => {
 
       return res.status(200).json({
         success: true,
-        user,
+        data:user,
         token: userToken,
         message: userMessage.SignInUser,
       });
@@ -170,7 +170,7 @@ export const signIn = async (req, res) => {
 
       return res.status(200).json({
         success: true,
-        agent,
+        data:agent,
         token: agentToken,
         message: userMessage.SignInAgent,
       });
@@ -182,7 +182,7 @@ export const signIn = async (req, res) => {
 
       return res.status(200).json({
         success: true,
-        admin,
+        data:admin,
         token: adminToken,
         message: userMessage.SignInAdmin,
       });
@@ -523,14 +523,14 @@ export const googleLoginUser = async (req, res) => {
 };
 
 
-// export const logOutUser = async (req,res) =>{
-//   try {
+export const logOutUser = async (req,res) =>{
+  try {
 
-//      return res.status(200).json({success:true,message:userMessage.LogOut})
-//   } catch (error) {
-//     return res.status(501).json({ success: false, message: error.message });
-//   }
-// }
+     return res.status(200).json({success:true,message:userMessage.LogOut})
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+}
 
 export const totalUserCount = async (req, res) => {
   try {

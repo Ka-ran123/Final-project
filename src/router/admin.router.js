@@ -24,4 +24,6 @@ router.get("/getall-rentproperty-admin", verifyUser, getOnlyRentPropertyForAdmin
 router.get("/getall-sellproperty-admin", verifyUser, getOnlySellPropertyForAdmin);
 
 
+router.get("/get-selected-property/:key",verifyUser,getAllSelectedProperty);
+
 export const adminRouter = router;
