@@ -27,6 +27,15 @@ export const addFeedBack = async (req, res) => {
         .json({ success: false, message: errorMessage.InvalidData });
     }
 
+    const findFeedback=await FeedBackModel.find({email:email})
+    if(findFeedback)
+    {
+      return res
+      .status(400)
+      .json({ success: false, message: errorMessage.findFeedback });
+  }
+    
+
     const feedback = new FeedBackModel({ name, email, rating, message });
     await feedback.save();
 

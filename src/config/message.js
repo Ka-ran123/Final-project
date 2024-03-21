@@ -59,6 +59,7 @@ export const Message = {
     AgentNotFound: "Agent Does Not Found",
     AgentAlreadyExits: "Agent Already Exits",
     AdminCantSend: "Admin Can Not Send Feedback",
+    findFeedback:"Can't Send Multiple Feedback "
   },
   emailMessage: {
     SignupSubject: "Signup Successfully in Home Hub Market",
