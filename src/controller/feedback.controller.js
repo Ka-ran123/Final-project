@@ -27,7 +27,7 @@ export const addFeedBack = async (req, res) => {
         .json({ success: false, message: errorMessage.InvalidData });
     }
 
-    const findFeedback=await FeedBackModel.find({email:email})
+    const findFeedback=await FeedBackModel.findOne({email:email})
     if(findFeedback)
     {
       return res

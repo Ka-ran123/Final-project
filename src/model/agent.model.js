@@ -90,13 +90,18 @@ const agentSchema = new Schema(
             required: true,
             trim: true
         },
-        aadharCardPic: {
-            type: [String],
+        adharCardFront: {
+            type: String,
             required: true,
             trim: true
         },
-        panCardPic: {
-            type: [String],
+        adharCardBack: {
+            type: String,
+            required: true,
+            trim: true
+        },
+        panCard: {
+            type: String,
             required: true,
             trim: true
         },
