@@ -97,98 +97,67 @@ export const getAllSelectedProperty = async (req, res) => {
   try {
     const user = req.user;
 
-    if (user.role === "USER" || user.role === "ADMIN") {
-      const status = req.params.key;
-      let allProperty;
-      if (status == "All") {
-        allProperty = await PropertyModel.find();
-      } else if (status == "Rejected") {
-        allProperty = await PropertyModel.find({ status: "cancel" });
-      } else if (status == "Pending") {
-        allProperty = await PropertyModel.find({ status: "pending" });
-      } else if (status == "Approved") {
-        allProperty = await PropertyModel.find({ status: "approval" });
-      }
-      if (!allProperty) {
-        return res
-          .status(400)
-          .json({ success: false, message: errorMessage.InvalidData });
-      }
-      return res.status(200).json({
-        success: true,
-        allProperty,
-        message: propertyMessage.GetAllProperty,
+    if (user.role === "USER") {
+      return res
+        .status()
+        .json({ success: false, message: errorMessage.UserCantSee });
+    }
+    const status = req.params.key;
+    let allProperty;
+    if (status == "All") {
+      allProperty = await PropertyModel.find();
+    } else if (status == "Rejected") {
+      allProperty = await PropertyModel.find({ status: "cancel" });
+    } else if (status == "Pending") {
+      allProperty = await PropertyModel.find({ status: "pending" });
+    } else if (status == "Approved") {
+      allProperty = await PropertyModel.find({ status: "approval" });
+    }
+    if (!allProperty) {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.InvalidData });
+    }
+    return res.status(200).json({
+      success: true,
+      allProperty,
+      message: propertyMessage.GetAllProperty,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const getAllSelectedPropertyUser = async (req, res) => {
+  try {
+    const user = req.user;
+
+    const status = req.params.key;
+    let allProperty;
+    if (status == "All") {
+      allProperty = await PropertyModel.find({ userId: user._id });
+    } else if (status == "Rejected") {
+      allProperty = await PropertyModel.find({
+        $and: [{ userId: user._id }, { status: "cancel" }],
+      });
+    } else if (status == "Pending") {
+      allProperty = await PropertyModel.find({
+        $and: [{ userId: user._id }, { status: "pending" }],
+      });
+    } else if (status == "Approved") {
+      allProperty = await PropertyModel.find({
+        $and: [{ userId: user._id }, { status: "approval" }],
       });
     }
-  } catch (error) {
-    return res.status(501).json({ success: false, message: error.message });
-  }
-};
-
-export const getUserAllProperty = async (req, res) => {
-  try {
-    const user = req.user;
-
-    const propertyData = await PropertyModel.find({ userId: user._id });
-
+    if (!allProperty) {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.InvalidData });
+    }
     return res.status(200).json({
       success: true,
-      propertyData,
-      message: propertyMessage.GetUserAllProperty,
-    });
-  } catch (error) {
-    return res.status(501).json({ success: false, message: error.message });
-  }
-};
-
-export const getUserPendingProperty = async (req, res) => {
-  try {
-    const user = req.user;
-
-    const propertyData = await PropertyModel.find({
-      $and: [{ userId: user._id }, { status: "pending" }],
-    });
-
-    return res.status(200).json({
-      success: true,
-      propertyData,
-      message: propertyMessage.GetUserPendingProperty,
-    });
-  } catch (error) {
-    return res.status(501).json({ success: false, message: error.message });
-  }
-};
-
-export const getUserApprovalProperty = async (req, res) => {
-  try {
-    const user = req.user;
-
-    const propertyData = await PropertyModel.find({
-      $and: [{ userId: user._id }, { status: "approval" }],
-    });
-
-    return res.status(200).json({
-      success: true,
-      propertyData,
-      message: propertyMessage.GetUserApprovalProperty,
-    });
-  } catch (error) {
-    return res.status(501).json({ success: false, message: error.message });
-  }
-};
-
-export const getUserCancleProperty = async (req, res) => {
-  try {
-    const user = req.user;
-
-    const propertyData = await PropertyModel.find({
-      $and: [{ userId: user._id }, { status: "cancel" }],
-    });
-
-    return res.status(200).json({
-      success: true,
-      propertyData,
-      message: propertyMessage.GetUserCancelProperty,
+      allProperty,
+      message: propertyMessage.GetAllProperty,
     });
   } catch (error) {
     return res.status(501).json({ success: false, message: error.message });
