@@ -10,7 +10,8 @@ import {
   getOnlySellProperty,
   getOnlyRentProperty,
   getAllSelectedProperty,
-  getAllSelectedPropertyUser
+  getAllSelectedPropertyUser,
+  getUserAllProperty
 } from "../controller/property.controller.js";
 
 const router = Router();
@@ -22,6 +23,7 @@ router.post(
   addProperty
 );
 router.get("/getall-property", verifyUser, getAllProperty);
+router.get("/getuserall-property", verifyUser, getUserAllProperty);
 router.post("/set-approveproperty", verifyUser, setApproveProperty);
 router.post("/set-cancelproperty", verifyUser, setCancelProperty);
 

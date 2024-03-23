@@ -164,6 +164,22 @@ export const getAllSelectedPropertyUser = async (req, res) => {
   }
 };
 
+export const getUserAllProperty = async (req, res) => {
+  try {
+    const user = req.user;
+
+    const propertyData = await PropertyModel.find({ userId: user._id });
+
+    return res.status(200).json({
+      success: true,
+      propertyData,
+      message: propertyMessage.GetUserAllProperty,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
 export const getAllPropertyForApp = async (_, res) => {
   try {
     const allProperty = await PropertyModel.find();
