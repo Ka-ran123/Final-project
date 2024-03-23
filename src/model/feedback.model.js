@@ -31,6 +31,10 @@ const feedbackSchema = new Schema({
     required: true,
     trim: true,
   },
+  profilePic:{
+    type:String,
+    default:null
+  },
   createdAt: {
     type: Date,
     default: Date.now(),

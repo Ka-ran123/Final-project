@@ -27,16 +27,22 @@ export const addFeedBack = async (req, res) => {
         .json({ success: false, message: errorMessage.InvalidData });
     }
 
-    const findFeedback=await FeedBackModel.findOne({email:email})
-    if(findFeedback)
-    {
+    const findFeedback = await FeedBackModel.findOne({ email: email });
+    if (findFeedback) {
       return res
-      .status(400)
-      .json({ success: false, message: errorMessage.findFeedback });
-  }
-    
+        .status(400)
+        .json({ success: false, message: errorMessage.findFeedback });
+    }
 
-    const feedback = new FeedBackModel({ name, email, rating, message });
+    let profilePic = user.profilePic;
+
+    const feedback = new FeedBackModel({
+      name,
+      email,
+      rating,
+      message,
+      profilePic,
+    });
     await feedback.save();
 
     return res.status(200).json({
@@ -51,15 +57,11 @@ export const addFeedBack = async (req, res) => {
 
 export const getFeedBack = async (req, res) => {
   try {
-    const admin = req.user;
-    if (admin.role === "USER") {
-      return res
-        .status(400)
-        .json({ success: false, message: errorMessage.UserCantSee });
+    const user = req.user;
+    if (user.role === "USER" || user.role === "ADMIN") {
+      const feedbackList = await FeedBackModel.find();
+      return res.status(200).json({ data: feedbackList });
     }
-
-    const feedbackList = await FeedBackModel.find();
-    return res.status(200).json({ data: feedbackList });
   } catch (error) {
     return res.status(501).json({ success: false, message: error.message });
   }

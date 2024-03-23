@@ -13,6 +13,7 @@ import {
   getAllPropertyForApp,
   getOnlySellProperty,
   getOnlyRentProperty,
+  getAllSelectedProperty
 } from "../controller/property.controller.js";
 
 const router = Router();
@@ -35,5 +36,7 @@ router.post("/set-cancelproperty", verifyUser, setCancelProperty);
 router.get("/getall-property", getAllPropertyForApp);
 router.get("/getall-sellproperty", getOnlySellProperty);
 router.get("/getall-rentproperty", getOnlyRentProperty);
+
+router.get("/get-selected-property/:key", verifyUser, getAllSelectedProperty);
 
 export const propertyRouter = router;
