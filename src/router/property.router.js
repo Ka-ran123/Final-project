@@ -11,7 +11,10 @@ import {
   getOnlyRentProperty,
   getAllSelectedProperty,
   getAllSelectedPropertyUser,
-  getUserAllProperty
+  getUserAllProperty,
+  getUserApprovalProperty,
+  getUserCancleProperty,
+  getUserPendingProperty
 } from "../controller/property.controller.js";
 
 const router = Router();
@@ -24,6 +27,9 @@ router.post(
 );
 router.get("/getall-property", verifyUser, getAllProperty);
 router.get("/getuserall-property", verifyUser, getUserAllProperty);
+router.get("/getuserpending-property", verifyUser, getUserPendingProperty);
+router.get("/getuserapproval-property", verifyUser, getUserApprovalProperty);
+router.get("/getusercancel-property", verifyUser, getUserCancleProperty);
 router.post("/set-approveproperty", verifyUser, setApproveProperty);
 router.post("/set-cancelproperty", verifyUser, setCancelProperty);
 

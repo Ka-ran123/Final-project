@@ -180,6 +180,60 @@ export const getUserAllProperty = async (req, res) => {
   }
 };
 
+export const getUserPendingProperty = async (req, res) => {
+  try {
+    const user = req.user;
+
+    const propertyData = await PropertyModel.find({
+      $and: [{ userId: user._id }, { status: "pending" }],
+    });
+
+    return res.status(200).json({
+      success: true,
+      propertyData,
+      message: propertyMessage.GetUserPendingProperty,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const getUserApprovalProperty = async (req, res) => {
+  try {
+    const user = req.user;
+
+    const propertyData = await PropertyModel.find({
+      $and: [{ userId: user._id }, { status: "approval" }],
+    });
+
+    return res.status(200).json({
+      success: true,
+      propertyData,
+      message: propertyMessage.GetUserApprovalProperty,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const getUserCancleProperty = async (req, res) => {
+  try {
+    const user = req.user;
+
+    const propertyData = await PropertyModel.find({
+      $and: [{ userId: user._id }, { status: "cancel" }],
+    });
+
+    return res.status(200).json({
+      success: true,
+      propertyData,
+      message: propertyMessage.GetUserCancelProperty,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
 export const getAllPropertyForApp = async (_, res) => {
   try {
     const allProperty = await PropertyModel.find();
