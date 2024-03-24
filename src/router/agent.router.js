@@ -13,8 +13,9 @@ const router = Router();
 router.post(
   "/add-agent",
   upload.fields([
-    { name: "aadharCardPic", maxCount: 2 },
-    { name: "panCardPic", maxCount: 2 },
+    { name: "adharCardFront", maxCount: 1 },
+    { name: "adharCardBack", maxCount: 1 },
+    { name: "panCard", maxCount: 1 },
   ]),
   addAgent
 );

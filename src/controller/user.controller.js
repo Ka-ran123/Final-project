@@ -522,7 +522,6 @@ export const googleLoginUser = async (req, res) => {
   }
 };
 
-
 export const logOutUser = async (req,res) =>{
   try {
 

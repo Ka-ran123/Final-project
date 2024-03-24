@@ -99,26 +99,56 @@ export const getAllSelectedProperty = async (req, res) => {
 
     if (user.role === "USER") {
       return res
-        .status(400)
-        .json({ success: false, message: errorMessage.InvalidData });
+        .status()
+        .json({ success: false, message: errorMessage.UserCantSee });
     }
     const status = req.params.key;
     let allProperty;
-    if(status == "All"){
+    if (status == "All") {
       allProperty = await PropertyModel.find();
+    } else if (status == "Rejected") {
+      allProperty = await PropertyModel.find({ status: "cancel" });
+    } else if (status == "Pending") {
+      allProperty = await PropertyModel.find({ status: "pending" });
+    } else if (status == "Approved") {
+      allProperty = await PropertyModel.find({ status: "approval" });
     }
-    else if(status == "Rejected")
-    {
-      allProperty = await PropertyModel.find({status:"cancel"});
+    if (!allProperty) {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.InvalidData });
     }
-    else if(status == "Pending"){
-      allProperty = await PropertyModel.find({status:"pending"});
-    }
-    else if(status == "Approved"){
-      allProperty = await PropertyModel.find({status:"approval"});
-    }
-    
+    return res.status(200).json({
+      success: true,
+      allProperty,
+      message: propertyMessage.GetAllProperty,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
 
+export const getAllSelectedPropertyUser = async (req, res) => {
+  try {
+    const user = req.user;
+
+    const status = req.params.key;
+    let allProperty;
+    if (status == "All") {
+      allProperty = await PropertyModel.find({ userId: user._id });
+    } else if (status == "Rejected") {
+      allProperty = await PropertyModel.find({
+        $and: [{ userId: user._id }, { status: "cancel" }],
+      });
+    } else if (status == "Pending") {
+      allProperty = await PropertyModel.find({
+        $and: [{ userId: user._id }, { status: "pending" }],
+      });
+    } else if (status == "Approved") {
+      allProperty = await PropertyModel.find({
+        $and: [{ userId: user._id }, { status: "approval" }],
+      });
+    }
     if (!allProperty) {
       return res
         .status(400)
@@ -328,7 +358,7 @@ export const totalPropertyCount = async (req, res) => {
         .json({ success: false, message: errorMessage.UserCantSeeTotal });
     }
 
-    const property = await PropertyModel.find({status:"approval"}).count();
+    const property = await PropertyModel.find({ status: "approval" }).count();
     if (!property) {
       return res
         .status(404)
@@ -413,7 +443,7 @@ export const getAllPropertyForAdmin = async (req, res) => {
         .json({ success: false, message: errorMessage.UserCantSee });
     }
 
-    const allProperty = await PropertyModel.find({status:"approval"});
+    const allProperty = await PropertyModel.find({ status: "approval" });
     if (!allProperty) {
       return res
         .status(400)

@@ -8,7 +8,6 @@ import {
   getAllPropertyForAdmin,
   getOnlyRentPropertyForAdmin,
   getOnlySellPropertyForAdmin,
-  getAllSelectedProperty,
 } from "../controller/property.controller.js";
 import { totalAgentCount, totalAgent } from "../controller/agent.controller.js";
 import { verifyUser } from "../middleware/auth.middleware.js";
@@ -32,6 +31,6 @@ router.get(
   getOnlySellPropertyForAdmin
 );
 
-router.get("/get-selected-property/:key", verifyUser, getAllSelectedProperty);
+
 
 export const adminRouter = router;

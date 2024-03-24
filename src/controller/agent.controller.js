@@ -1,8 +1,7 @@
 import { AgentModel } from "../model/agent.model.js";
-import { UserModel } from "../model/user.model.js";
 import { generateToken } from "../utils/genToken.js";
 import { publicUrl } from "../utils/profilepic.js";
-import { transporter, sendEmail } from "../utils/nodemailer.js";
+import { sendEmail } from "../utils/nodemailer.js";
 import { fileUploadInCloudinary } from "../utils/clodinary.js";
 
 import { Message } from "../config/message.js";
@@ -29,24 +28,19 @@ export const addAgent = async (req, res) => {
     const nameFirstLetter = data.name.toLowerCase().slice(0, 1);
     const url = publicUrl(nameFirstLetter);
 
-    const aadharCardImage = [];
-    for (let i = 0; i < req.files["aadharCardPic"].length; i++) {
-      let result = await fileUploadInCloudinary(
-        req.files["aadharCardPic"][i].path
-      );
-      aadharCardImage.push(result.secure_url);
-    }
+    const adharFront = await fileUploadInCloudinary(
+      req.files["adharCardFront"][0].path
+    );
 
-    const panCardImage = [];
-    for (let i = 0; i < req.files["panCardPic"].length; i++) {
-      let result = await fileUploadInCloudinary(
-        req.files["panCardPic"][i].path
-      );
-      panCardImage.push(result.secure_url);
-    }
+    const adharBack = await fileUploadInCloudinary(
+      req.files["adharCardBack"][0].path
+    );
+    const panCard = await fileUploadInCloudinary(req.files["panCard"][0].path);
 
-    data.aadharCardPic = aadharCardImage;
-    data.panCardPic = panCardImage;
+    data.adharCardFront = adharFront.secure_url;
+    data.adharCardBack = adharBack.secure_url;
+    data.panCard = panCard.secure_url;
+
 
     const agent = new AgentModel({ ...data, profilePic: url });
     await agent.save();
