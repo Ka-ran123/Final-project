@@ -34,7 +34,7 @@ export const addQuery = async (req, res) => {
         .json({ success: false, message: errorMessage.findContact });
     }
 
-    const userQuery = new FeedBackModel({
+    const userQuery = new contactModel({
       name,
       email,
       subject,
