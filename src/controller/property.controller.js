@@ -506,3 +506,24 @@ export const getOnlyRentPropertyForAdmin = async (req, res) => {
     return res.status(501).json({ success: false, message: error.message });
   }
 };
+
+export const getRecentProperty = async (req, res) => {
+  try {
+    const admin = req.user;
+    if (admin.role === "USER") {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.UserCantSee });
+    }
+
+    const recentProperty = await PropertyModel.find()
+      .sort({
+        createdAt:-1,
+      })
+      .limit(10);
+
+    return res.status(200).json({ success: true, recentProperty });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
