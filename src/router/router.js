@@ -4,6 +4,7 @@ import { propertyRouter } from "./property.router.js";
 import { agentRouter } from "./agent.router.js"
 import { adminRouter } from "./admin.router.js";
 import { feedbackRouter } from "./feedback.router.js";
+import { contactRouter } from "./contact.router.js";
 
 const router = Router();
 
@@ -12,6 +13,6 @@ router.use('/property' ,propertyRouter)
 router.use('/agent' ,agentRouter)
 router.use('/admin' , adminRouter)
 router.use('/feedback' , feedbackRouter)
-
+router.use('/contact' , contactRouter)
 
 export {router}

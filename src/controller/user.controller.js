@@ -1,7 +1,7 @@
 import { UserModel } from "../model/user.model.js";
 import { AgentModel } from "../model/agent.model.js";
 import { generateToken } from "../utils/genToken.js";
-import { sendEmail } from "../utils/nodemailer.js";
+import { sendEmail, transporter } from "../utils/nodemailer.js";
 import { generateOTP } from "../utils/genOtp.js";
 import { OtpModel } from "../model/otp.model.js";
 import { publicUrl } from "../utils/profilepic.js";
@@ -11,7 +11,8 @@ import {
 } from "../utils/clodinary.js";
 import { Message } from "../config/message.js";
 import { OAuth2Client } from "google-auth-library";
-const  client = new OAuth2Client(process.env.CLIENTID)
+import { response } from "express";
+const client = new OAuth2Client(process.env.CLIENTID);
 
 const { userMessage, errorMessage, emailMessage } = Message;
 
@@ -149,7 +150,6 @@ export const signIn = async (req, res) => {
         .json({ success: false, message: errorMessage.InvalidCredentials });
     }
 
-  
     if (findUser) {
       const user = await UserModel.findById(findUser._id).select(
         "-password -publicUrl"
@@ -158,7 +158,7 @@ export const signIn = async (req, res) => {
 
       return res.status(200).json({
         success: true,
-        data:user,
+        data: user,
         token: userToken,
         message: userMessage.SignInUser,
       });
@@ -170,7 +170,7 @@ export const signIn = async (req, res) => {
 
       return res.status(200).json({
         success: true,
-        data:agent,
+        data: agent,
         token: agentToken,
         message: userMessage.SignInAgent,
       });
@@ -182,7 +182,7 @@ export const signIn = async (req, res) => {
 
       return res.status(200).json({
         success: true,
-        data:admin,
+        data: admin,
         token: adminToken,
         message: userMessage.SignInAdmin,
       });
@@ -221,24 +221,41 @@ export const verifyEmail = async (req, res) => {
               </tr>
               </table>
               `;
-    const mailOptions = {
-      to: email,
-      subject: emailMessage.VerifyEmailSubject,
-      html: mailFormat,
-    };
+    // const mailOptions = {
+    //   to: email,
+    //   subject: emailMessage.VerifyEmailSubject,
+    //   html: mailFormat,
+    // };
 
-    await sendEmail(mailOptions);
-    await OtpModel.findOneAndDelete({ email });
-    const userOtp = new OtpModel({ email: email, otp: otp });
-    await userOtp.save();
+    // await sendEmail(mailOptions);
 
-    setTimeout(async () => {
-      await OtpModel.findOneAndDelete({ email: email });
-    }, 1000 * 60);
+    transporter.sendMail(
+      {
+        to: email,
+        subject: emailMessage.VerifyEmailSubject,
+        html: mailFormat,
+      },
+      async (err, info) => {
+        if (err) {
+          console.log(err);
+          return res
+            .status(400)
+            .json({ success: false, message: "email not send" });
+        } else {
+          await OtpModel.findOneAndDelete({ email });
+          const userOtp = new OtpModel({ email: email, otp: otp });
+          await userOtp.save();
 
-    return res
-      .status(200)
-      .json({ success: true, message: userMessage.VerifyEmail });
+          setTimeout(async () => {
+            await OtpModel.findOneAndDelete({ email: email });
+          }, 1000 * 60);
+
+          return res
+            .status(200)
+            .json({ success: true, message: userMessage.VerifyEmail });
+        }
+      }
+    );
   } catch (error) {
     return res.status(501).json({ success: false, message: error.message });
   }
@@ -522,14 +539,13 @@ export const googleLoginUser = async (req, res) => {
   }
 };
 
-export const logOutUser = async (req,res) =>{
+export const logOutUser = async (req, res) => {
   try {
-
-     return res.status(200).json({success:true,message:userMessage.LogOut})
+    return res.status(200).json({ success: true, message: userMessage.LogOut });
   } catch (error) {
     return res.status(501).json({ success: false, message: error.message });
   }
-}
+};
 
 export const totalUserCount = async (req, res) => {
   try {
@@ -541,7 +557,7 @@ export const totalUserCount = async (req, res) => {
         .json({ success: false, message: errorMessage.UserCantSeeTotal });
     }
 
-    const users = await UserModel.find({role:"USER"}).count();
+    const users = await UserModel.find({ role: "USER" }).count();
     if (!users) {
       return res
         .status(404)
@@ -568,7 +584,7 @@ export const totalUser = async (req, res) => {
         .json({ success: false, message: errorMessage.UserCantSee });
     }
 
-    const users = await UserModel.find({role:"USER"});
+    const users = await UserModel.find({ role: "USER" });
     if (!users) {
       return res
         .status(404)
@@ -577,7 +593,7 @@ export const totalUser = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      data:users,
+      data: users,
       message: userMessage.TotalUser,
     });
   } catch (error) {
