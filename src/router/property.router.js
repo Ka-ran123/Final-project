@@ -14,7 +14,8 @@ import {
   getUserAllProperty,
   getUserApprovalProperty,
   getUserCancleProperty,
-  getUserPendingProperty
+  getUserPendingProperty,
+  getFilterProperty
 } from "../controller/property.controller.js";
 
 const router = Router();
@@ -39,5 +40,7 @@ router.get("/getall-rentproperty", getOnlyRentProperty);
 
 router.get("/get-selected-property/:key", verifyUser, getAllSelectedProperty);
 router.get("/get-selected-property-user/:key", verifyUser, getAllSelectedPropertyUser);
+
+router.get("/get-filterproperty", getFilterProperty);
 
 export const propertyRouter = router;

@@ -32,13 +32,8 @@ const feedbackSchema = new Schema({
     trim: true,
   },
   profilePic:{
-<<<<<<< HEAD
-    type: String,
-    require:true
-=======
     type:String,
     default:null
->>>>>>> karan
   },
   createdAt: {
     type: Date,

@@ -506,3 +506,36 @@ export const getOnlyRentPropertyForAdmin = async (req, res) => {
     return res.status(501).json({ success: false, message: error.message });
   }
 };
+
+export const getFilterProperty = async (req, res) => {
+  try {
+    const data = req.query;
+
+    let city = data.city;
+    let price = data.price;
+    let square_feet_start = data.square_feet_start;
+    let square_feet_end = data.square_feet_end;
+    let property_type = data.property_type;
+    let bhk = data.bhk;
+
+
+    let property;
+    if (!city && !price && !square_feet_start && !square_feet_end && !property_type && !bhk) {
+      property = await PropertyModel.find();
+    }
+    else {
+      property = await PropertyModel.find({
+        $or: [{ city: city }, { price: { $lte: price} }, { size: { $gte: square_feet_start, $lte: square_feet_end } }, { propertyType: property_type }, { houseType: bhk }],
+      })
+    }
+
+    return res.status(200).json({
+      success: true,
+      property,
+      message: propertyMessage.GetAllProperty,
+    });
+
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
