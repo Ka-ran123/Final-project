@@ -539,6 +539,7 @@ export const getFilterProperty = async (req, res) => {
     return res.status(501).json({ success: false, message: error.message });
   }
 };
+
 export const getRecentProperty = async (req, res) => {
   try {
     const admin = req.user;
@@ -555,6 +556,40 @@ export const getRecentProperty = async (req, res) => {
       .limit(10);
 
     return res.status(200).json({ success: true, recentProperty });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const addLikeInProperty = async (req, res) => {
+  try {
+    const user = req.user;
+    if (user.role === "ADMIN") {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.AdminCantChange });
+    }
+
+    const data = req.body;
+    
+    const property = await PropertyModel.findByIdAndUpdate({_id:data.id},{isLike:data.isLike},{new:true})
+    return res.status(200).json({ success: true, property });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const getLikeProperty = async (req, res) => {
+  try {
+    const user = req.user;
+    if (user.role === "ADMIN") {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.AdminCantSee});
+    }
+
+    const property = await PropertyModel.find({isLike:true})
+    return res.status(200).json({ success: true, property });
   } catch (error) {
     return res.status(501).json({ success: false, message: error.message });
   }

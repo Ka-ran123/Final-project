@@ -127,6 +127,10 @@ const propertySchema = new Schema(
       ref: "agent",
       default: null,
     },
+    isLike: {
+      type: Boolean,
+      default: false
+    }
   },
   { timestamps: true }
 );

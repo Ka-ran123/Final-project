@@ -10,7 +10,7 @@ import {
   getOnlySellPropertyForAdmin,
   getRecentProperty
 } from "../controller/property.controller.js";
-import { totalAgentCount, totalAgent } from "../controller/agent.controller.js";
+import { totalAgentCount, totalAgent ,setApproveAgent,setCancelAgent} from "../controller/agent.controller.js";
 import { verifyUser } from "../middleware/auth.middleware.js";
 
 router.get("/total-user-count", verifyUser, totalUserCount);
@@ -32,6 +32,8 @@ router.get(
   getOnlySellPropertyForAdmin
 );
 
-router.get('/recent-property' , verifyUser , getRecentProperty)
+router.get('/recent-property' , verifyUser , getRecentProperty);
+router.post('/set-approveagent',verifyUser,setApproveAgent);
+router.post('/set-cancelagent',verifyUser,setCancelAgent);
 
 export const adminRouter = router;

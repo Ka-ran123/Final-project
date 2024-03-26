@@ -280,3 +280,67 @@ export const totalAgent = async (req, res) => {
     return res.status(501).json({ success: false, message: error.message });
   }
 };
+
+export const setApproveAgent = async (req, res) => {
+  try {
+    const admin = req.user;
+
+    if (admin.role === "USER") {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.UserCantChange });
+    }
+
+    const data = req.body.id;
+
+    const agent = await AgentModel.findById(data);
+    if (!agent) {
+      return res
+        .status(404)
+        .json({ success: false, message: errorMessage.AgentNotFound });
+    }
+
+    agent.status = "approval";
+    await agent.save();
+
+    return res.status(200).json({
+      success: true,
+      agent,
+      message: agentMessage.SetApproveAgent,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};
+
+export const setCancelAgent = async (req, res) => {
+  try {
+    const admin = req.user;
+
+    if (admin.role === "USER") {
+      return res
+        .status(400)
+        .json({ success: false, message: errorMessage.UserCantChange });
+    }
+
+    const data = req.body.id;
+
+    const agent = await AgentModel.findById(data);
+    if (!agent) {
+      return res
+        .status(404)
+        .json({ success: false, message: errorMessage.AgentNotFound });
+    }
+
+    agent.status = "cancel";
+    await agent.save();
+
+    return res.status(200).json({
+      success: true,
+      agent,
+      message: agentMessage.setCancelAgent,
+    });
+  } catch (error) {
+    return res.status(501).json({ success: false, message: error.message });
+  }
+};

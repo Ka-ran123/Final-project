@@ -105,6 +105,14 @@ const agentSchema = new Schema(
       required: true,
       trim: true,
     },
+    status: {
+      type: String,
+      enum: {
+        values: ["approval", "cancel", "pending"],
+        message: "Plz ! Select One..!",
+      },
+      default: "pending",
+    },
     date: {
       type: Date,
       default: Date.now(),

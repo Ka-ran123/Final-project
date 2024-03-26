@@ -15,7 +15,9 @@ import {
   getUserApprovalProperty,
   getUserCancleProperty,
   getUserPendingProperty,
-  getFilterProperty
+  getFilterProperty,
+  addLikeInProperty,
+  getLikeProperty
 } from "../controller/property.controller.js";
 
 const router = Router();
@@ -42,5 +44,8 @@ router.get("/get-selected-property/:key", verifyUser, getAllSelectedProperty);
 router.get("/get-selected-property-user/:key", verifyUser, getAllSelectedPropertyUser);
 
 router.get("/get-filterproperty", getFilterProperty);
+
+router.put("/set-likeproperty",verifyUser,addLikeInProperty);
+router.get("/get-likeproperty",verifyUser,getLikeProperty)
 
 export const propertyRouter = router;
