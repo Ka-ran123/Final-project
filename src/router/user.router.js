@@ -14,6 +14,7 @@ import {
   googleLoginUser,
   getCurrentUser,
   logOutUser,
+  deleteUser
 } from "../controller/user.controller.js";
 const router = Router();
 
@@ -36,5 +37,6 @@ router.post("/google-login", googleLoginUser);
 router.get("/get-user", verifyUser, getCurrentUser);
 
 router.get("/log-out", verifyUser, logOutUser);
+router.delete("/delete-user", verifyUser,deleteUser);
 
 export const userRouter = router;

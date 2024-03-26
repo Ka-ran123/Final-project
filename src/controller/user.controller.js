@@ -1,6 +1,7 @@
 import { UserModel } from "../model/user.model.js";
 import { AgentModel } from "../model/agent.model.js";
-import { generateToken } from "../utils/genToken.js";
+import { PropertyModel } from "../model/property.model.js";
+import { generateToken, verifyToken } from "../utils/genToken.js";
 import { sendEmail, transporter } from "../utils/nodemailer.js";
 import { generateOTP } from "../utils/genOtp.js";
 import { OtpModel } from "../model/otp.model.js";
@@ -600,3 +601,35 @@ export const totalUser = async (req, res) => {
     return res.status(501).json({ success: false, message: error.message });
   }
 };
+
+export const deleteUser = async (req, res) => {
+  try {
+    const token = req.headers['authorization']?.split(' ')[1];
+    const password = req.body.password;
+    if (!token) {
+      return res.status(401).json({ success: false, message: "invalid user" });
+    }
+    const userTokenData = verifyToken(token);
+    if (!userTokenData.id) {
+      return res.status(401).json({ success: false, message: "invalid user" });
+    }
+    const userId = userTokenData.id;
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(401).json({ success: false, message: "invalid user" });
+    }
+
+    const matchUserPasssword = await user.isPasswordCorrect(password);
+    if (!matchUserPasssword) {
+      const response = { success: false, message: "Invalid Password" };
+      return res.status(400).json(response);
+    }
+    await UserModel.findByIdAndDelete({ _id: user.id });
+    await PropertyModel.deleteMany({ userId: user.id });
+    const response = { success: true, message: "Delete Successfully" };
+    return res.status(200).json(response);
+  } catch (error) {
+    const response = { success: false, message: error.message };
+    return res.status(400).json(response)
+  }
+}

@@ -237,7 +237,7 @@ export const totalAgentCount = async (req, res) => {
         .json({ success: false, message: errorMessage.UserCantSeeTotal });
     }
 
-    const agents = await AgentModel.find().count();
+    const agents = await AgentModel.find({status:"approval"}).count();
     if (!agents) {
       return res
         .status(404)
@@ -264,7 +264,7 @@ export const totalAgent = async (req, res) => {
         .json({ success: false, message: errorMessage.UserCantSee });
     }
 
-    const agents = await AgentModel.find();
+    const agents = await AgentModel.find({status:"approval"});
     if (!agents) {
       return res
         .status(404)
