@@ -222,41 +222,25 @@ export const verifyEmail = async (req, res) => {
               </tr>
               </table>
               `;
-    // const mailOptions = {
-    //   to: email,
-    //   subject: emailMessage.VerifyEmailSubject,
-    //   html: mailFormat,
-    // };
+    const mailOptions = {
+      to: email,
+      subject: emailMessage.VerifyEmailSubject,
+      html: mailFormat,
+    };
 
-    // await sendEmail(mailOptions);
+    await sendEmail(mailOptions);
 
-    transporter.sendMail(
-      {
-        to: email,
-        subject: emailMessage.VerifyEmailSubject,
-        html: mailFormat,
-      },
-      async (err, info) => {
-        if (err) {
-          console.log(err);
-          return res
-            .status(400)
-            .json({ success: false, message: "email not send" });
-        } else {
-          await OtpModel.findOneAndDelete({ email });
-          const userOtp = new OtpModel({ email: email, otp: otp });
-          await userOtp.save();
+    await OtpModel.findOneAndDelete({ email });
+    const userOtp = new OtpModel({ email: email, otp: otp });
+    await userOtp.save();
 
-          setTimeout(async () => {
-            await OtpModel.findOneAndDelete({ email: email });
-          }, 1000 * 60);
+    setTimeout(async () => {
+      await OtpModel.findOneAndDelete({ email: email });
+    }, 1000 * 60);
 
-          return res
-            .status(200)
-            .json({ success: true, message: userMessage.VerifyEmail });
-        }
-      }
-    );
+    return res
+      .status(200)
+      .json({ success: true, message: userMessage.VerifyEmail });
   } catch (error) {
     return res.status(501).json({ success: false, message: error.message });
   }
@@ -604,7 +588,7 @@ export const totalUser = async (req, res) => {
 
 export const deleteUser = async (req, res) => {
   try {
-    const user=req.user
+    const user = req.user;
 
     const matchUserPasssword = await user.isPasswordCorrect(password);
     if (!matchUserPasssword) {
@@ -617,6 +601,6 @@ export const deleteUser = async (req, res) => {
     return res.status(200).json(response);
   } catch (error) {
     const response = { success: false, message: error.message };
-    return res.status(400).json(response)
+    return res.status(400).json(response);
   }
-}
+};
