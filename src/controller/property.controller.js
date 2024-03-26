@@ -42,7 +42,7 @@ export const addProperty = async (req, res) => {
       let num = Math.floor((Math.random() * 10) / 2) + 1;
       // console.log(num);
       agentId = findAgent[num]._id;
-    } else {
+    } else {   
       agentId = findAgent._id;
     }
 

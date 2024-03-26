@@ -604,20 +604,7 @@ export const totalUser = async (req, res) => {
 
 export const deleteUser = async (req, res) => {
   try {
-    const token = req.headers['authorization']?.split(' ')[1];
-    const password = req.body.password;
-    if (!token) {
-      return res.status(401).json({ success: false, message: "invalid user" });
-    }
-    const userTokenData = verifyToken(token);
-    if (!userTokenData.id) {
-      return res.status(401).json({ success: false, message: "invalid user" });
-    }
-    const userId = userTokenData.id;
-    const user = await UserModel.findById(userId);
-    if (!user) {
-      return res.status(401).json({ success: false, message: "invalid user" });
-    }
+    const user=req.user
 
     const matchUserPasssword = await user.isPasswordCorrect(password);
     if (!matchUserPasssword) {
