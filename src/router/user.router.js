@@ -37,6 +37,6 @@ router.post("/google-login", googleLoginUser);
 router.get("/get-user", verifyUser, getCurrentUser);
 
 router.get("/log-out", verifyUser, logOutUser);
-router.delete("/delete-user", verifyUser,deleteUser);
+router.delete("/delete-user",deleteUser);
 
 export const userRouter = router;
