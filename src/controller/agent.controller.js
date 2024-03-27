@@ -41,7 +41,6 @@ export const addAgent = async (req, res) => {
     data.adharCardBack = adharBack.secure_url;
     data.panCard = panCard.secure_url;
 
-
     const agent = new AgentModel({ ...data, profilePic: url });
     await agent.save();
 
@@ -198,7 +197,7 @@ export const verifyEmail = async (req, res) => {
                                           <h1>**Verification**</h1>
                                           <p>Hello there!</p>
                                           <p>If you want to become an agent, click on the link below and fill up the form..</p>
-                                          <a href="${`https://homehubmarket-b65c6.web.app/agent/`}">💥Click this link to fill form💥</a>
+                                          <a href="${`http://localhost:3000/agent/`}">💥Click this link to fill form💥</a>
                                           <p>Best regards</p>
                                           <p>Home-Hub Market</p>
                                          
@@ -237,7 +236,7 @@ export const totalAgentCount = async (req, res) => {
         .json({ success: false, message: errorMessage.UserCantSeeTotal });
     }
 
-    const agents = await AgentModel.find({status:"approval"}).count();
+    const agents = await AgentModel.find({ status: "approval" }).count();
     if (!agents) {
       return res
         .status(404)
@@ -264,7 +263,7 @@ export const totalAgent = async (req, res) => {
         .json({ success: false, message: errorMessage.UserCantSee });
     }
 
-    const agents = await AgentModel.find({status:"approval"});
+    const agents = await AgentModel.find({ status: "approval" });
     if (!agents) {
       return res
         .status(404)

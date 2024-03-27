@@ -1,0 +1,752 @@
+{
+	"info": {
+		"_postman_id": "203a1b98-cc43-4e27-9175-220a87c7fe3a",
+		"name": "Final-Project",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "30250721"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "sign-up",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"karan\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/auth/sign-up",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"auth",
+								"sign-up"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "sign-in",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"abc12@gmail.com\",\r\n    \"password\":\"123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/auth/sign-in",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"auth",
+								"sign-in"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "verify-email",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"karanunagar123@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/auth/verify-email",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"auth",
+								"verify-email"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "verify-otp",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"karanunagar123@gmail.com\",\r\n    \"otp\":\"6639914\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/auth/verify-otp",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"auth",
+								"verify-otp"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1YmUwN2Q2YTRjZDM3YzFhNzcyMjVkZSIsImlhdCI6MTcwNzE5NTk4NH0.d2fweHmYif_I0y6GxDxWjOvfYUc0mUz6rOcgfyB9CvE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/auth/get-user",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"auth",
+								"get-user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "forget-password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"karanunagar123@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/auth/forget-password",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"auth",
+								"forget-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "reset-password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"karanunagar123@gmail.com\",\r\n    \"newPassword\":\"karan@123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/auth/reset-password",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"auth",
+								"reset-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "change-password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"oldPassword\":\"karan@123\",\r\n    \"newPassword\":\"karan\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/auth/change-password",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"auth",
+								"change-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "change-profilePic",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "profilePic",
+									"type": "file",
+									"src": "/D:/IMG_20230131_221904.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{server}}/auth/change-profilePic",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"auth",
+								"change-profilePic"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete-profilePic",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/auth/delete-profilePic",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"auth",
+								"delete-profilePic"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "render-signup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://homehubmarket.onrender.com/api/v1/sign-up",
+							"protocol": "https",
+							"host": [
+								"homehubmarket",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sign-up"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "render-signin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"\",\r\n    \"password\":\"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://homehubmarket.onrender.com/api/v1/auth/sign-in",
+							"protocol": "https",
+							"host": [
+								"homehubmarket",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"sign-in"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "render-resetPassword",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"abc123@gmail.com\",\r\n    \"newPassword\":\"karan\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://homehubmarket.onrender.com/api/v1/auth/reset-password",
+							"protocol": "https",
+							"host": [
+								"homehubmarket",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"reset-password"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "property",
+			"item": [
+				{
+					"name": "add-property",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZTg4NTczM2IzNDI1NmJhZTBjMzdkOCIsImlhdCI6MTcwOTc1MDQ1NH0.jnDPlC2AD1SPOpQiQG5S_HwU5lMUSR_6oljSHaf0u2k",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "type",
+									"value": "Sell",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "pradip1",
+									"type": "text"
+								},
+								{
+									"key": "propertyImage",
+									"type": "file",
+									"src": [
+										"/C:/Users/karan/Downloads/WhatsApp Image 2024-01-31 at 5.23.24 PM.jpeg",
+										"/C:/Users/karan/Downloads/WhatsApp Image 2024-01-31 at 4.17.31 PM.jpeg"
+									]
+								},
+								{
+									"key": "address",
+									"value": "gujarat,surat",
+									"type": "text"
+								},
+								{
+									"key": "state",
+									"value": "gujarat",
+									"type": "text"
+								},
+								{
+									"key": "city",
+									"value": "surat",
+									"type": "text"
+								},
+								{
+									"key": "size",
+									"value": "40*12",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "1500000",
+									"type": "text"
+								},
+								{
+									"key": "propertyAge",
+									"value": "2 year",
+									"type": "text"
+								},
+								{
+									"key": "floorNo",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "rooms",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "propertyType",
+									"value": "Appartement",
+									"type": "text"
+								},
+								{
+									"key": "faching",
+									"value": "North",
+									"type": "text"
+								},
+								{
+									"key": "houseType",
+									"value": "1BK",
+									"type": "text"
+								},
+								{
+									"key": "facility",
+									"value": "bathrrom,washroom",
+									"type": "text"
+								},
+								{
+									"key": "furnishing",
+									"value": "Unfurnished",
+									"type": "text"
+								},
+								{
+									"key": "mobileNo",
+									"value": "1234567894",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "karanunagar123@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "status",
+									"value": "cancle",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{server}}/property/add-property",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"property",
+								"add-property"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getuserall-property",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "getuser-pending-property",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "getuser-approval-property",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "getadmin-all-property",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/property/getall-property",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"property",
+								"getall-property"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getuser-cancle-property",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/property/getusercancle-property",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"property",
+								"getusercancle-property"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZTg4NTczM2IzNDI1NmJhZTBjMzdkOCIsImlhdCI6MTcwOTc1MzAxMX0.dpdkzSWhukp7oWpQJC9913Cd5l7JV2e8hFO5uvo5k8M",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "type",
+									"value": "",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://homehubmarket.onrender.com/api/v1/property/add-property",
+							"protocol": "https",
+							"host": [
+								"homehubmarket",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"property",
+								"add-property"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "for app",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "render all",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://homehubmarket.onrender.com/api/v1/property/getall-property-app",
+							"protocol": "https",
+							"host": [
+								"homehubmarket",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"property",
+								"getall-property-app"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "render sell",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://homehubmarket.onrender.com/api/v1/property/getall-sellproperty-app",
+							"protocol": "https",
+							"host": [
+								"homehubmarket",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"property",
+								"getall-sellproperty-app"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "render rent",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://homehubmarket.onrender.com/api/v1/property/getall-rentproperty-app",
+							"protocol": "https",
+							"host": [
+								"homehubmarket",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"property",
+								"getall-rentproperty-app"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "agent",
+			"item": [
+				{
+					"name": "agent-verifyemail",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"pradiptimbadiya@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/agent/verify-agent",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"agent",
+								"verify-agent"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "agent-add",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

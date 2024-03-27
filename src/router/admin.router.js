@@ -8,15 +8,21 @@ import {
   getAllPropertyForAdmin,
   getOnlyRentPropertyForAdmin,
   getOnlySellPropertyForAdmin,
-  getRecentProperty
+  getRecentProperty,
 } from "../controller/property.controller.js";
-import { totalAgentCount, totalAgent ,setApproveAgent,setCancelAgent} from "../controller/agent.controller.js";
+import {
+  totalAgentCount,
+  totalAgent,
+  setApproveAgent,
+  setCancelAgent,
+  getAllAgent,
+} from "../controller/agent.controller.js";
 import { verifyUser } from "../middleware/auth.middleware.js";
 
 router.get("/total-user-count", verifyUser, totalUserCount);
 router.get("/getall-user", verifyUser, totalUser);
 router.get("/total-agent-count", verifyUser, totalAgentCount);
-router.get("/getall-agent", verifyUser, totalAgent);
+router.get("/getall-agent", verifyUser, getAllAgent);
 router.get("/total-property-count", verifyUser, totalPropertyCount);
 router.get("/total-rentproperty-count", verifyUser, totalRentPropertyCount);
 router.get("/total-sellproperty-count", verifyUser, totalSellPropertyCount);
@@ -32,8 +38,8 @@ router.get(
   getOnlySellPropertyForAdmin
 );
 
-router.get('/recent-property' , verifyUser , getRecentProperty);
-router.post('/set-approveagent',verifyUser,setApproveAgent);
-router.post('/set-cancelagent',verifyUser,setCancelAgent);
+router.get("/recent-property", verifyUser, getRecentProperty);
+router.post("/set-approveagent", verifyUser, setApproveAgent);
+router.post("/set-cancelagent", verifyUser, setCancelAgent);
 
 export const adminRouter = router;
